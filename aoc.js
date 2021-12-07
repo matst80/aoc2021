@@ -69,8 +69,9 @@ const registerDay = (day) => {
     }
     let [input, testInput] = getInput(day);
     let dayModule = loadJs(`./${day}/main.js`);
-    execute();
+    //execute();
     const result = {
+        execute,
         reloadData: () => {
             [input, testInput] = getInput(day);
             execute();
@@ -106,7 +107,16 @@ else {
 }
 getDay('day' + currentDate);
 
-fs.watch('./', { encoding: 'utf8', recursive: true }, (e, file) => {
+function debounce(func, timeout = 300) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
+}
+
+fs.watch('./', { encoding: 'utf8', recursive: true }, debounce((e, file) => {
+    //console.log(e, file);
     if (file.includes('/') && file.includes('day')) {
         console.clear();
         const [day, name] = file.split('/');
@@ -121,6 +131,6 @@ fs.watch('./', { encoding: 'utf8', recursive: true }, (e, file) => {
         console.clear();
         console.log('\nReload answers\n');
         answers = loadJs('./answers.js');
-        Object.values(days).forEach(d => d.reloadMain());
+        Object.values(days).forEach(d => d.execute());
     }
-})
+}));

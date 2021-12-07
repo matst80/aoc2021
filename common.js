@@ -1,10 +1,5 @@
 const fs = require("fs");
 
-const read = (file, split = '\n') => fs
-    .readFileSync(file)
-    .toString()
-    .split(split);
-
 const numbers = (separator = ',') => (input) => input.split(separator).toNumber();
 
 const stepper =
@@ -87,7 +82,6 @@ const getResultAfter = (nr,fn) => {
 module.exports = {
     seq,
     getResultAfter,
-    read,
     add,
     manhattan,
     stepper,

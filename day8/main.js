@@ -1,10 +1,10 @@
 const { seq, chars, lower, manhattan, stepper, numbers } = require('../common.js');
 
-const transform = numbers(',')
+const transform = numbers(',');
 
 const part1 = (i) => {
     const result = i;
-    return result;
+    return 0;
 }
 
 const part2 = (i) => {
