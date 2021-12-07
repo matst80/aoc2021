@@ -1,4 +1,4 @@
-const { seq } = require('../common.js');
+const { seq, numbers } = require('../common.js');
 
 const countAdds = (all) => all.reduce(({ l, a }, j) => {
     if (l && l < j) {
@@ -9,17 +9,15 @@ const countAdds = (all) => all.reduce(({ l, a }, j) => {
 
 const getSum = (i) => (_, s) => i[s] + (i[s + 1] || 0) + (i[s + 2] || 0);
 
-const transform = (input) => {
-    return input.split('\n').toNumber()
-}
+const transform = numbers('\n');
 
 const part1 = (i) => {
-    return countAdds(i);
+    return countAdds(i).a;
 }
 
 const part2 = (i) => {
     const i2 = i.map(getSum(i));
-    return countAdds(i2);
+    return countAdds(i2).a;
 }
 
 module.exports = {

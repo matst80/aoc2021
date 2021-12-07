@@ -14,11 +14,12 @@ const getInput = (day) => {
     ];
 }
 
-const run = ({ transform, part1, part2 }, input) => {
+const run = ({ transform, part1, part2 }, input, [answerA, answerB]) => {
     const data = transform(input);
+    const compare = (a, b) => Boolean(a) ? (a == b ? ' ✅' : ` ❌ [${a}]`) : '';
     try {
         const a = part1(data);
-        console.log(`Part1: `, a)
+        console.log(`Part1: `, a, compare(answerA, a))
     }
     catch (err) {
         console.error('Part1', err);
@@ -27,7 +28,7 @@ const run = ({ transform, part1, part2 }, input) => {
         try {
             const b = part2(data);
             if (b !== undefined) {
-                console.log(`Part2: `, b);
+                console.log(`Part2: `, b, compare(answerB, b));
             }
         }
         catch (err) {
@@ -56,13 +57,14 @@ let answers = require('./answers');
 
 const registerDay = (day) => {
     const execute = () => {
+        const [testAnswer = [], realAnswer = []] = answers[day] ?? [];
         if (isValid(testInput)) {
             console.log(`\nRunning ${day} with testdata:`);
-            run(dayModule, testInput);
+            run(dayModule, testInput, testAnswer);
         }
         if (isValid(input)) {
             console.log(`\nRunning ${day} with REAL data:`);
-            run(dayModule, input);
+            run(dayModule, input, realAnswer);
         }
     }
     let [input, testInput] = getInput(day);
@@ -116,6 +118,8 @@ fs.watch('./', { encoding: 'utf8', recursive: true }, (e, file) => {
 
     }
     else if (file.includes('answers.js')) {
-        console.log('load answers');
+        console.log('\nReload answers\n');
+        answers = loadJs('./answers.js');
+        Object.values(days).forEach(d=>d.reloadMain());
     }
 })
