@@ -43,6 +43,13 @@ const extentLines = (points) => {
     }, { width: 0, height: 0, top: 9999999, left: 9999999 });
 }
 
+const expand = ({ top, left, width, height }, size = 1) => ({
+    top: top - size,
+    left: left - size,
+    width: width + size * 2,
+    height: height + size * 2,
+});
+
 const gridLoop = ({ top = 0, left = 0, width, height }, cb, arr = []) => {
     const grid = [];
     for (y = top; y <= height; y++) {
@@ -91,5 +98,6 @@ module.exports = {
     makeGrid,
     extent,
     extentLines,
-    formatGrid
+    formatGrid,
+    expand
 }
