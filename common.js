@@ -1,0 +1,74 @@
+const fs = require("fs");
+
+const read = (file, split = '\n') => fs
+    .readFileSync(file)
+    .toString()
+    .split(split);
+
+const numbers = (separator = ',') => (input) => input.split(separator).toNumber();
+
+const stepper =
+    (items, idx = 0) =>
+        () =>
+            items[idx++];
+
+const add = (sum, i) => sum + i;
+
+Array.prototype.toNumber = function () {
+    return this.map((d) => d.trim()).filter((d) => d.length).map(Number);
+}
+
+const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const lower = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
+const extent = (points) => {
+    return points.reduce(({ top, left, width, height }, [x, y]) => {
+        return {
+            top: Math.min(top, y),
+            left: Math.min(left, x),
+            width: Math.max(width, x),
+            height: Math.max(height, y)
+        }
+    }, { width: 0, height: 0, top: 9999999, left: 9999999 });
+}
+
+const gridLoop = ({ top = 0, left = 0, width, height }, cb, arr = []) => {
+    const grid = [];
+    for (y = top; y <= height; y++) {
+        const line = [];
+        for (x = left; x <= width; x++) {
+            const pos = (y * width) + x;
+            line.push(cb(pos, x, y, arr[pos]));
+        }
+        //console.log(y);
+        grid.push(line);
+    }
+    return grid;
+}
+
+const formatGrid = (grid, width, height) => {
+    return gridLoop(width, height, (pos, x, y, v) => v, grid).map(l => l.join(' '));
+};
+
+const seq = (l) => new Array(l).fill(0).map((_, i) => i);
+
+const makeGrid = (width, height, fill = 0) => {
+    return new Array((height + 1) * width).fill(fill)
+}
+
+const manhattan = ([x0, y0], [x1, y1]) => Math.abs(x1 - x0) + Math.abs(y1 - y0);
+
+module.exports = {
+    seq,
+    read,
+    add,
+    manhattan,
+    stepper,
+    numbers,
+    chars,
+    gridLoop,
+    lower,
+    makeGrid,
+    extent,
+    formatGrid
+}
