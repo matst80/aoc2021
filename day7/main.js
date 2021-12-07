@@ -10,10 +10,10 @@ const part1 = (i) => {
 }
 
 const part2 = (i) => {
-    const result = i;
+    const result = i;//
     return result;
 }
 
 module.exports = {
-    transform, part1, part2
+    transform, part1, part2, test:true
 }

@@ -1,8 +1,6 @@
-const { seq } = require('../common.js');
+const { seq, chars, lower, manhattan, stepper, numbers } = require('../common.js');
 
-const transform = (input) => {
-    return input.split(',').toNumber();
-}
+const transform = numbers(',');
 
 const part1 = (i) => {
     const result = i;
@@ -10,7 +8,7 @@ const part1 = (i) => {
 }
 
 const part2 = (i) => {
-    const result = i;
+    const result = undefined;
     return result;
 }
 
