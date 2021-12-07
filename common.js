@@ -32,6 +32,17 @@ const extent = (points) => {
     }, { width: 0, height: 0, top: 9999999, left: 9999999 });
 }
 
+const extentLines = (points) => {
+    return points.reduce(({ top, left, width, height }, {x1,y1,x2,y2}) => {
+        return {
+            top: Math.min(top, y1,y2),
+            left: Math.min(left, x1,x2),
+            width: Math.max(width, x1,x2),
+            height: Math.max(height, y1,y2)
+        }
+    }, { width: 0, height: 0, top: 9999999, left: 9999999 });
+}
+
 const gridLoop = ({ top = 0, left = 0, width, height }, cb, arr = []) => {
     const grid = [];
     for (y = top; y <= height; y++) {
@@ -58,8 +69,17 @@ const makeGrid = (width, height, fill = 0) => {
 
 const manhattan = ([x0, y0], [x1, y1]) => Math.abs(x1 - x0) + Math.abs(y1 - y0);
 
+const getResultAfter = (nr,fn) => {
+    let c = 0;
+    for (var j = 0; j < nr; j++) {
+        c = fn();
+    }
+    return c;
+}
+
 module.exports = {
     seq,
+    getResultAfter,
     read,
     add,
     manhattan,
@@ -70,5 +90,6 @@ module.exports = {
     lower,
     makeGrid,
     extent,
+    extentLines,
     formatGrid
 }

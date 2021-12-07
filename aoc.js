@@ -15,7 +15,7 @@ const getInput = (day) => {
 }
 
 const run = ({ transform, part1, part2 }, input, [answerA, answerB]) => {
-    const data = transform(input);
+    const data = transform ? transform(input) : input;
     const compare = (a, b) => Boolean(a) ? (a == b ? ' ✅' : ` ❌ [${a}]`) : '';
     try {
         const a = part1(data);
@@ -107,7 +107,8 @@ else {
 getDay('day' + currentDate);
 
 fs.watch('./', { encoding: 'utf8', recursive: true }, (e, file) => {
-    if (file.includes('/')) {
+    if (file.includes('/') && file.includes('day')) {
+        console.clear();
         const [day, name] = file.split('/');
         const dayFn = getDay(day);
         if (name.includes('.js'))
@@ -115,11 +116,11 @@ fs.watch('./', { encoding: 'utf8', recursive: true }, (e, file) => {
         else {
             dayFn.reloadData();
         }
-
     }
     else if (file.includes('answers.js')) {
+        console.clear();
         console.log('\nReload answers\n');
         answers = loadJs('./answers.js');
-        Object.values(days).forEach(d=>d.reloadMain());
+        Object.values(days).forEach(d => d.reloadMain());
     }
 })

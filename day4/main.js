@@ -1,6 +1,4 @@
-const { seq, chars, lower, manhattan, stepper, numbers } = require('../common.js');
-
-const { read, add, stepper } = require("./common");
+const { seq, stepper, numbers, add } = require('../common.js');
 
 const parseBoards = (acc, line, idx) => {
   if (idx === 0)
@@ -19,11 +17,6 @@ const parseBoards = (acc, line, idx) => {
   return acc;
 };
 
-const data = read("day4.txt", "\n").reduce(parseBoards, {
-  tmp: [],
-  boards: [],
-});
-
 const getRows = (lines) =>
   lines[0].map((_, idx) => lines.map((line) => line[idx]));
 
@@ -37,38 +30,35 @@ const flattenAndRemove = (drawn) => (result, line) =>
 
 const wonThisRound = (hasWon) => (d) => !hasWon.includes(d);
 
-const checkWinners = (numbers, requiredWinners = 1) => {
+const checkWinners = (data, numbers, requiredWinners = 1) => {
   const next = stepper(numbers);
   const checkBoards = (drawn, hasWon = []) => {
     const winners = data.boards.filter(checkRows(drawn));
 
     return winners.length === requiredWinners
       ? winners
-          .find(wonThisRound(hasWon))
-          .reduce(flattenAndRemove(drawn), [])
-          .reduce(add, 0) * drawn[drawn.length - 1]
+        .find(wonThisRound(hasWon))
+        .reduce(flattenAndRemove(drawn), [])
+        .reduce(add, 0) * drawn[drawn.length - 1]
       : checkBoards([...drawn, next()], winners);
   };
 
   return checkBoards([next()]);
 };
 
-console.log(checkWinners(data.drawn, data.boards.length));
+const transform = (input) => input.split('\n').reduce(parseBoards, {
+  tmp: [],
+  boards: [],
+})
 
-
-
-const transform = numbers(',');
-
-const part1 = (i) => {
-    const result = i;
-    return result;
+const part1 = (data) => {
+  return checkWinners(data, data.drawn, 1);
 }
 
-const part2 = (i) => {
-    const result = undefined;
-    return result;
+const part2 = (data) => {
+  return checkWinners(data, data.drawn, data.boards.length);
 }
 
 module.exports = {
-    transform, part1, part2
+  transform, part1, part2
 }

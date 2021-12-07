@@ -1,4 +1,4 @@
-const { seq, chars, lower, extent, manhattan, stepper, numbers } = require('../common.js');
+const { seq, chars, lower, extentLines, manhattan, stepper, numbers } = require('../common.js');
 
 const getStepAndLength = ({ x1, y1, x2, y2 }) => {
     const length = Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1));
@@ -17,27 +17,19 @@ const splitToCoords = (line) => {
     return { ...coords, ...getStepAndLength(coords) };
 };
 
-const data = read("day5.txt").map(splitToCoords);
-
-
-const { width, height } = extent(data);
-const grid = new Array(width * height + width).fill(0);
-
-const draw = (drawDiagonal) => ({ x1, y1, xs, ys, length }) => {
+const draw = (grid, width, drawDiagonal) => ({ x1, y1, xs, ys, length }) => {
     if (drawDiagonal || (xs == 0 || ys == 0))
         for (var step = 0; step <= length; step++) {
             const x = step * xs + x1;
             const y = step * ys + y1;
 
-            grid[y * extent.width + x] += 1;
+            grid[y * width + x] += 1;
         }
 };
 
-data.forEach(draw(true));
 
 const countMultiples = (sum, i) => (i > 1) ? sum + 1 : sum;
 
-console.log("sum", grid.reduce(countMultiples, 0));
 
 const printGrid = (grid) => {
     for (y = 0; y <= height; y++) {
@@ -49,18 +41,25 @@ const printGrid = (grid) => {
     }
 };
 
+const transform = input => input.split('\n').map(splitToCoords);
 
+const part1 = (data) => {
 
-const transform = numbers(',');
+    const { width, height } = extentLines(data);
+    const grid = new Array(width * height + width).fill(0);
 
-const part1 = (i) => {
-    const result = i;
-    return result;
+    data.forEach(draw(grid, width, false));
+
+    return grid.reduce(countMultiples, 0);
 }
 
-const part2 = (i) => {
-    const result = undefined;
-    return result;
+const part2 = (data) => {
+    const { width, height } = extentLines(data);
+    const grid = new Array(width * height + width).fill(0);
+
+    data.forEach(draw(grid, width, true));
+
+    return grid.reduce(countMultiples, 0);
 }
 
 module.exports = {
