@@ -1,27 +1,11 @@
 
 const { add } = require('../common.js');
 
+const parseSegment = (input) =>
+    input.split('').sort((a, b) => a.localeCompare(b)).join('');
 
-const parseSegment = (input) => {
-    return input.split('').sort((a, b) => a.localeCompare(b)).join('');
-}
-
-const transform = (input) => input.split('\n').map(line => line.split('|').map(d => d.split(' ').map(d => d.trim()).filter(d => d && d != ' ')));//.map(parseSegment)
-
-
-const countLengths = (lengths) => (sum, item) => {
-    if (lengths.includes(item.length))
-        return sum + 1;
-    return sum;
-}
-
-
-const part1 = (i) => {
-
-    const lengthsToFind = [2, 4, 3, 7];
-
-    return i.map(([_, p2]) => p2).flat().reduce(countLengths(lengthsToFind), 0);
-}
+const countLengths = (lengths) => (sum, item) =>
+    sum + (lengths.includes(item.length) ? 1 : 0);
 
 const getUnknown = (arr, known) => {
     const t = Object.values(known);
@@ -71,6 +55,13 @@ const findNumbers = (arr) => {
 const parseLine = ([test, toDisplay]) => {
     const numbers = findNumbers(test);
     return Number(toDisplay.map(j => numbers[parseSegment(j)]).join(''));
+}
+
+const transform = (input) => input.split('\n').map(line => line.split('|').map(d => d.split(' ').trim()));
+
+const part1 = (i) => {
+    const lengthsToFind = [2, 4, 3, 7];
+    return i.map(([_, p2]) => p2).flat().reduce(countLengths(lengthsToFind), 0);
 }
 
 const part2 = (i) => {

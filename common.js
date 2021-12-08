@@ -13,6 +13,10 @@ Array.prototype.toNumber = function () {
     return this.map((d) => d.trim()).filter((d) => d.length).map(Number);
 }
 
+Array.prototype.trim = function () {
+    return this.map(d => d.trim()).filter(d => d && d.length);
+}
+
 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 const lower = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
