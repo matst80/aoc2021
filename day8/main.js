@@ -41,14 +41,12 @@ const hasAll = (...match) => (str) => str.split('').every(i => {
 const findNumbers = (arr) => {
 
     let byLength = groupByLengths(arr);
-
     const known = {
         '1': byLength[2][0],
         '4': byLength[4][0],
         '7': byLength[3][0],
         '8': byLength[7][0],
     };
-
     let unknown = getUnknown(arr, known);
 
     const add = (nr, value) => {
@@ -57,16 +55,15 @@ const findNumbers = (arr) => {
         byLength = groupByLengths(unknown);
     }
 
-    add('3', byLength[5].find(hasAll(byLength[2][0])));
+    add('3', byLength[5].find(hasAll(known[1])));
     add('9', byLength[6].find(hasAll(known[7], known[4])));
     add('0', byLength[6].find(hasAll(known[7])));
     add('6', byLength[6][0]);
 
-
     const f = known[8].split('').filter(d => !known['6'].includes(d));
 
-    add('2', unknown.find(d => d.length == 5 && d.includes(f)));
-    add('5', unknown[0]);
+    add('2', byLength[5].find(d => d.includes(f)));
+    add('5', unknown[0]); // woho final
 
     return Object.entries(known).reduce((sum, [k, v]) => ({ ...sum, [parseSegment(v)]: k }), {});
 }
