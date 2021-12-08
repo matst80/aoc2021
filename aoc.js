@@ -67,7 +67,7 @@ const registerDay = (day) => {
             console.log(`\nRunning ${day} with testdata:`);
             run(dayModule, testInput, testAnswer);
         }
-        if (isValid(input)) {
+        if (isValid(input) && !test) {
             console.log(`\nRunning ${day} with REAL data:`);
             run(dayModule, input, realAnswer);
         }
@@ -83,6 +83,7 @@ const registerDay = (day) => {
         },
         reloadMain: () => {
             dayModule = loadJs(`./${day}/main.js`);
+            test = !!dayModule.test;
             execute();
         }
     }
