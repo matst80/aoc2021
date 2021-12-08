@@ -9,22 +9,22 @@ const parseSegment = (input) => {
 }
 
 
-const segments = [
-    'abcefg',
-    'cg',
-    'acdeg',
-    'acdfg',
-    'bcdfg',
-    'abdfg',
-    'abdfge',
-    'acf',
-    'abcdefg',
-    'abcdfg',
+const segments = [ // 1 4 7 8
+    'abcefg', // 0
+    'cg', // 1
+    'acdeg', // 2
+    'acdfg', // 3
+    'bcdf', // 4
+    'abdfg', // 5
+    'abdfge', // 6
+    'acf', // 7
+    'abcdefg', // 8
+    'abcdfg', // 9
 ].map(parseSegment);
 
-console.log(segments);
+//console.log(segments);
 
-const transform = (input) => input.split('\n').map(line => line.split('|').map(d => d.split(' ').filter(d => d && d != ' ')));
+const transform = (input) => input.split('\n').map(line => line.split('|').map(d => d.split(' ').map(d=>d.trim()).filter(d => d && d != ' ')));//.map(parseSegment)
 
 const count = (valuesToFind, cnt) => ([p1, p2]) => {
     //console.log(p2,valuesToFind);
@@ -49,10 +49,10 @@ const part1 = (i) => {
     const find = [segments[1], segments[4], segments[7], segments[8]]
     const match = count(find);
     const r = i.map(match).flat();
-    //const r = i.map(([_, p2]) => p2).flat();
+    //const r = i.map(([_, p2]) => p2).flat();  
     const result = r.reduce(countUnique, { count: 0, found: [] });
     console.log(result);
-    return r.length;
+    return result.count;
 }
 
 const part2 = (i) => {

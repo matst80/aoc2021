@@ -4,8 +4,8 @@ const isValid = (d) => d && d !== null && d.length;
 
 const getInput = (day) => {
     console.log('Loading data for', day);
-    const mainFile = `./${day}/input.txt`;
-    const testFile = `./${day}/test.txt`;
+    const mainFile = fs.realpathSync(`./${day}/input.txt`);
+    const testFile = fs.realpathSync(`./${day}/test.txt`);
     return [
         fs.existsSync(mainFile) ?
             fs.readFileSync(mainFile).toString() : null,
@@ -57,6 +57,7 @@ let answers = require('./answers');
 
 const registerDay = (day) => {
     const execute = () => {
+        console.log('running');
         const [testAnswer = [], realAnswer = []] = answers[day] ?? [];
         if (isValid(testInput)) {
             console.log(`\nRunning ${day} with testdata:`);
@@ -115,9 +116,10 @@ function debounce(func, timeout = 300) {
     };
 }
 
-fs.watch('./', { encoding: 'utf8', recursive: true }, debounce((e, file) => {
-    //console.log(e, file);
-    if (file.includes('/') && file.includes('day')) {
+fs.watch('./', { encoding: 'utf8', recursive: true }, debounce((e, filePath) => {
+    console.log(e, filePath);
+    const file = filePath.replace('\\','/');
+    if (file.replace('\\','/').includes('/') && file.includes('day')) {
         console.clear();
         const [day, name] = file.split('/');
         const dayFn = getDay(day);
