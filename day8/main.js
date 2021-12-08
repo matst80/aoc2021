@@ -28,15 +28,22 @@ const getUnknown = (arr, known) => {
     return arr.filter(d => !t.includes(d));
 }
 
+const groupByLengths = (arr) => arr.reduce((sum, i) => {
+    return { ...sum, [i.length]: [...sum[i.length] ?? [], i] }
+}, {});
+
+const hasAll = (...match) => (str) => str.split('').every(i => {
+    return match.every(k => k.split('').every(j => {
+        return str.includes(j);
+    }));
+});
+
 const findNumbers = (arr) => {
 
-    let byLength = arr.reduce((sum, i) => {
-        return { ...sum, [i.length]: [...sum[i.length] ?? [], i] }
-    }, {});
+    let byLength = groupByLengths(arr);
 
     const known = {
         '1': byLength[2][0],
-        '3': byLength[5].find(d => byLength[2][0].split('').every(i => d.includes(i))),
         '4': byLength[4][0],
         '7': byLength[3][0],
         '8': byLength[7][0],
@@ -47,20 +54,12 @@ const findNumbers = (arr) => {
     const add = (nr, value) => {
         known[nr] = value;
         unknown = getUnknown(arr, known)
-        byLength = unknown.reduce((sum, i) => {
-            return { ...sum, [i.length]: [...sum[i.length] ?? [], i] }
-        }, {});
-
+        byLength = groupByLengths(unknown);
     }
-    add('9', byLength[6].find(d => {
-        return known[7].split('').every(i => d.includes(i)) && known[4].split('').every(i => d.includes(i))
-    }));
 
-
-    add('0', byLength[6].find(d => {
-        return known[7].split('').every(i => d.includes(i))
-    }));
-
+    add('3', byLength[5].find(hasAll(byLength[2][0])));
+    add('9', byLength[6].find(hasAll(known[7], known[4])));
+    add('0', byLength[6].find(hasAll(known[7])));
     add('6', byLength[6][0]);
 
 
@@ -68,7 +67,6 @@ const findNumbers = (arr) => {
 
     add('2', unknown.find(d => d.length == 5 && d.includes(f)));
     add('5', unknown[0]);
-
 
     return Object.entries(known).reduce((sum, [k, v]) => ({ ...sum, [parseSegment(v)]: k }), {});
 }
@@ -79,9 +77,7 @@ const parseLine = ([test, toDisplay]) => {
 }
 
 const part2 = (i) => {
-
     return i.map(parseLine).reduce(add, 0);
-
 }
 
 module.exports = {
