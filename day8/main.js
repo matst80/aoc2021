@@ -5,7 +5,7 @@ const { seq, manhattan, stepper, numbers, add } = require('../common.js');
 const mul = (sum, i) => sum * i;
 
 const parseSegment = (input) => {
-    return input.split('').sort().join('');
+    return input.split('').sort((a, b) => a.localeCompare(b)).join('');
 }
 
 
@@ -24,11 +24,11 @@ const segments = [
 
 console.log(segments);
 
-const transform = (input) => input.split('\n').map(line => line.split('|').map(d => d.split(' ').filter(d => d && d != ' ')));
+const transform = (input) => input.split('\n').map(line => line.split('|').map(d => d.split(' ').filter(d => d && d != ' ').map(parseSegment)));
 
 const count = (valuesToFind, cnt) => ([p1, p2]) => {
     //console.log(p2,valuesToFind);
-    return p1.filter(d => valuesToFind.includes(parseSegment(d)));
+    return p1.filter(d => valuesToFind.includes(d));
 }
 
 const countUnique = (sum, item) => {
@@ -38,21 +38,24 @@ const countUnique = (sum, item) => {
     return sum;
 }
 
-const countUniqueLen = (sum, item) => {
-    if (!sum.found.includes(item.length)) {
-        return { count: sum.count + 1, found: [...sum.found, item.length] }
-    }
+const countLengths = (lengths) => (sum, item) => {
+    if (lengths.includes(item.length))
+        return sum + 1;
     return sum;
 }
 
 const part1 = (i) => {
-    const find = [segments[1], segments[4], segments[7], segments[8]]
+
+    const find = [segments[1], segments[4], segments[7], segments[8]];
+    
     const match = count(find);
-    const r = i.map(match).flat();
-    //const r = i.map(([_, p2]) => p2).flat();
-    const result = r.reduce(countUnique, { count: 0, found: [] });
+    //const r = i.map(match).flat();
+
+    const r = i.map(([_, p2]) => p2).flat();
+    
+    const result = r.reduce(countLengths(find.map(k => k.length)), 0);
     console.log(result);
-    return r.length;
+    return result;
 }
 
 const part2 = (i) => {
