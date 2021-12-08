@@ -18,17 +18,21 @@ const run = ({ transform, part1, part2 }, input, [answerA, answerB]) => {
     const data = transform ? transform(input) : input;
     const compare = (a, b) => Boolean(a) ? (a == b ? ' ✅' : ` ❌ [${a}]`) : '';
     try {
+        const start = Date.now();
         const a = part1(data);
-        console.log(`Part1: `, a, compare(answerA, a))
+        const diff = Date.now()-start;
+        console.log(`Part1: `, a, compare(answerA, a),` [${Math.round(diff)}ms]`)
     }
     catch (err) {
         console.error('Part1', err);
     }
     if (part2) {
         try {
+            const start = Date.now();
             const b = part2(data);
+            const diff = Date.now()-start;
             if (b !== undefined) {
-                console.log(`Part2: `, b, compare(answerB, b));
+                console.log(`Part2: `, b, compare(answerB, b),` [${Math.round(diff)}ms]`);
             }
         }
         catch (err) {
