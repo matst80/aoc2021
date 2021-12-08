@@ -69,7 +69,7 @@ const registerDay = (day) => {
         }
     }
     let [input, testInput] = getInput(day);
-    let dayModule = loadJs(`./${day}/main.js`);
+    let { test=false, ...dayModule } = loadJs(`./${day}/main.js`);
     //execute();
     const result = {
         execute,
@@ -118,8 +118,8 @@ function debounce(func, timeout = 300) {
 
 fs.watch('./', { encoding: 'utf8', recursive: true }, debounce((e, filePath) => {
     console.log(e, filePath);
-    const file = filePath.replace('\\','/');
-    if (file.replace('\\','/').includes('/') && file.includes('day')) {
+    const file = filePath.replace('\\', '/');
+    if (file.replace('\\', '/').includes('/') && file.includes('day')) {
         console.clear();
         const [day, name] = file.split('/');
         const dayFn = getDay(day);
