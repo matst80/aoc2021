@@ -117,7 +117,6 @@ function debounce(func, timeout = 300) {
 }
 
 fs.watch('./', { encoding: 'utf8', recursive: true }, debounce((e, filePath) => {
-    console.log(e, filePath);
     const file = filePath.replace('\\', '/');
     if (file.replace('\\', '/').includes('/') && file.includes('day')) {
         console.clear();
