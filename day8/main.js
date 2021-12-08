@@ -18,24 +18,18 @@ const countLengths = (lengths) => (sum, item) => {
 
 const part1 = (i) => {
 
+    const lengthsToFind = [2, 4, 3, 7];
 
-
-    const lenghtTofind = [2, 4, 3, 7];
-
-    const r = i.map(([_, p2]) => p2).flat();
-
-    const result = r.reduce(countLengths(lenghtTofind), 0);
-
-    return result;
+    return i.map(([_, p2]) => p2).flat().reduce(countLengths(lengthsToFind), 0);
 }
 
 const getUnknown = (arr, known) => {
-    const t = Object.values(known);    
+    const t = Object.values(known);
     return arr.filter(d => !t.includes(d));
 }
 
 const findNumbers = (arr) => {
-    
+
     let byLength = arr.reduce((sum, i) => {
         return { ...sum, [i.length]: [...sum[i.length] ?? [], i] }
     }, {});
@@ -79,17 +73,13 @@ const findNumbers = (arr) => {
     return Object.entries(known).reduce((sum, [k, v]) => ({ ...sum, [parseSegment(v)]: k }), {});
 }
 
+const parseLine = ([test, toDisplay]) => {
+    const numbers = findNumbers(test);
+    return Number(toDisplay.map(j => numbers[parseSegment(j)]).join(''));
+}
 
 const part2 = (i) => {
-    const parseLine = ([test, toDisplay]) => {
 
-
-        const numbers = findNumbers(test);
-
-        return Number(toDisplay.map(j => {
-            return numbers[parseSegment(j)];
-        }).join(''));
-    }
     return i.map(parseLine).reduce(add, 0);
 
 }
