@@ -72,7 +72,7 @@ const formatGrid = (grid, width, height) => {
 const seq = (l) => new Array(l).fill(0).map((_, i) => i);
 
 const makeGrid = (width, height, fill = 0) => {
-    return new Array((height + 1) * width).fill(fill)
+    return seq(height).map(_=>seq(width).fill(fill));
 }
 
 const manhattan = ([x0, y0], [x1, y1]) => Math.abs(x1 - x0) + Math.abs(y1 - y0);
@@ -85,12 +85,19 @@ const getResultAfter = (nr, fn) => {
     return c;
 }
 
-const getClosest = ({ width, height, top, left }) => (x, y) => {
+const getClosest = ({ width, height, top, left }, diagonal = false) => (x, y) => {
     const pos = [];
-    if (x > top) pos.push({ x: x - 1, y });
-    if (y > left) pos.push({ x, y: y - 1 });
+    if (x > left) pos.push({ x: x - 1, y });
+    if (y > top) pos.push({ x, y: y - 1 });
     if (x < width - 1) pos.push({ x: x + 1, y });
     if (y < height - 1) pos.push({ x, y: y + 1 });
+    if (diagonal) {
+        if (x > left && y > top) pos.push({ x: x - 1, y: y - 1 });
+        if (x < width - 1 && y > top) pos.push({ x: x + 1, y: y - 1 });
+
+        if (y < height - 1 && x < width - 1) pos.push({ x: x + 1, y: y + 1 });
+        if (y < height - 1 && x > left) pos.push({ x: x - 1, y: y + 1 });
+    }
     return pos;
 }
 
