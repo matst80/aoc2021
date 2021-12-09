@@ -31,11 +31,11 @@ const part2 = (map) => {
         }
     }
 
-    let basins = [], currentSize = 0;
-    getLow(map).map((p) => {
+    let currentSize = 0;
+    const basins = getLow(map).map((p) => {
         currentSize = 0;
         walk(p);
-        basins.push(currentSize);
+        return currentSize;
     })
 
     const [a, b, c] = basins.sort((a, b) => b - a);
