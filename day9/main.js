@@ -47,5 +47,5 @@ const part2 = (data) => {
 }
 
 module.exports = {
-    transform, part1, part2, test: 1
+    transform, part1, part2, test: 0
 }
