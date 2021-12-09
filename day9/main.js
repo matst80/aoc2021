@@ -19,23 +19,21 @@ const part1 = (data) => {
     return getLow(data).map(d => d.value + 1).reduce(add, 0);
 }
 
-const part2 = (data) => {
+const part2 = (map) => {
 
-    const size = extentArray(data);
+    const size = extentArray(map);
     const getClose = getClosest(size);
-
-    let map = [...data];
 
     const walk = (x, y) => {
         if (map[y][x] < excludeNr) {
             currentSize++;
-            map[y][x] = excludeNr;
+            map[y][x] = excludeNr
             getClose(x, y).forEach(i => walk(i.x, i.y));
         }
     }
 
     let basins = [], currentSize = 0;
-    getLow(data).map(({ x, y }) => {
+    getLow(map).map(({ x, y }) => {
         currentSize = 0;
         walk(x, y);
         basins.push(currentSize);
