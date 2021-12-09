@@ -55,21 +55,21 @@ const gridLoop = ({ top = 0, left = 0, width, height }, cb, arr = []) => {
     const grid = [];
     for (y = top; y < height; y++) {
         const line = [];
-        for (x = left; x < width; x++) {
-            //const pos = (y * width) + x;
-            line.push(cb(x, y, arr[y][x]));
+        for (x = left; x < width; x++) {   
+            const v = cb(x, y, arr[y][x]);
+            if (v!==-1)
+                line.push(v);
         }
-        //console.log(y);
         grid.push(line);
     }
     return grid;
 }
 
-const formatGrid = (grid, width, height) => {
-    return gridLoop(width, height, (pos, x, y, v) => v, grid).map(l => l.join(' '));
-};
+const formatGrid = (grid) => grid.map(line => line.join('')).join('\n');
 
 const seq = (l) => new Array(l).fill(0).map((_, i) => i);
+
+const count = (arr) => (value) => arr.reduce((sum, item) => item === value ? sum + 1 : sum, 0);
 
 const makeGrid = (width, height, fill = 0) => {
     return seq(height).map(_=>seq(width).fill(fill));
@@ -110,6 +110,7 @@ module.exports = {
     numbers,
     chars,
     gridLoop,
+    count,
     lower,
     makeGrid,
     extent,

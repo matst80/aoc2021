@@ -12,7 +12,7 @@ const getLow = (data) => {
     return gridLoop(size, (x, y, value) => {
         const close = getClose(x, y).map(getValue(data)).every(a => a > value);
         return close ? { x, y, value } : -1;
-    }, data).flat().filter(d => d !== -1);
+    }, data).flat();
 }
 
 const part1 = (data) => {
