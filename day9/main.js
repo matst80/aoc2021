@@ -1,16 +1,15 @@
-const { add, gridLoop, extentArray, getClosest } = require('../common.js');
+const { add, gridLoop, extentArray, getClosest, getValueAtPosition } = require('../common.js');
 
 const transform = input => input.split('\n').map(d => d.trim().split('').toNumber());
 
 const excludeNr = 9;
 
-const getValue = (data) => ({ x, y }) => data[y][x];
-
 const getLow = (data) => {
     const size = extentArray(data);
     const getClose = getClosest(size);
+    const get = getValueAtPosition(data);
     return gridLoop(size, (x, y, value) => {
-        const close = getClose(x, y).map(getValue(data)).every(a => a > value);
+        const close = getClose(x, y).map(get).every(a => a > value);
         return close ? { x, y, value } : -1;
     }, data).flat();
 }

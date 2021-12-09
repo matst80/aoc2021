@@ -85,6 +85,8 @@ const getResultAfter = (nr, fn) => {
     return c;
 }
 
+const getValueAtPosition = (data) => ({ x, y }) => data[y][x];
+
 const getClosest = ({ width, height, top, left }, diagonal = false) => (x, y) => {
     const pos = [];
     if (x > left) pos.push({ x: x - 1, y });
@@ -114,6 +116,7 @@ module.exports = {
     lower,
     makeGrid,
     extent,
+    getValueAtPosition,
     extentLines,
     extentArray,
     formatGrid,
