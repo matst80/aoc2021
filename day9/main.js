@@ -44,9 +44,9 @@ const part2 = ({ width, data }) => {
     }
 
     let basins = [], currentSize = 0;
-    lowPoints.map(p => {
+    lowPoints.map(({ x, y }) => {
         currentSize = 0;
-        walk(p.x, p.y);
+        walk(x, y);
         basins.push(currentSize);
     })
 
