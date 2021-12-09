@@ -1,4 +1,4 @@
-const { seq, chars, lower, manhattan, stepper, numbers } = require('../common.js');
+const { seq, log, makeGrid, gridLoop, extentArray, numbers } = require('../common.js');
 
 const transform = numbers(',');
 

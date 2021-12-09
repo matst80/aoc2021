@@ -16,12 +16,19 @@ const getInput = (day) => {
 
 const run = ({ transform, part1, part2 }, input, [answerA, answerB]) => {
     const data = transform ? transform(input) : input;
-    const compare = (a, b) => Boolean(a) ? (a == b ? ' ✅' : ` ❌ [${a}]`) : '';
+    const reset = '\x1b[0m';
+    const compare = (a, b) => a !== undefined
+        ? a === b
+            ? { text: '[OK]', color: '\x1b[32m' }
+            : { text: ` [${a}]`, color: '\x1b[31m' }
+        : { text: '', color: '\x1b[37m' };
+
     try {
         const start = Date.now();
         const a = part1(data);
         const diff = Date.now() - start;
-        console.log(`Part1: `, a, compare(answerA, a), ` [${Math.round(diff)}ms]`)
+        const { text, color } = compare(answerA, a);
+        console.log(`Part1: `, a, color, text, reset, `${Math.round(diff)}ms`)
     }
     catch (err) {
         console.error('Part1', err);
@@ -31,8 +38,9 @@ const run = ({ transform, part1, part2 }, input, [answerA, answerB]) => {
             const start = Date.now();
             const b = part2(data);
             const diff = Date.now() - start;
+            const { text, color } = compare(answerB, b);
             if (b !== undefined) {
-                console.log(`Part2: `, b, compare(answerB, b), ` [${Math.round(diff)}ms]`);
+                console.log(`Part2: `, b, color, text, reset, `${Math.round(diff)}ms`);
             }
         }
         catch (err) {
@@ -64,15 +72,16 @@ const days = {};
 let answers = require('./answers');
 
 const registerDay = (day) => {
+    let count = 0;
     const execute = () => {
-        console.log('running');
+        console.log('-------- ' + (++count) + ' --------');
         const [testAnswer = [], realAnswer = []] = answers[day] ?? [];
         if (isValid(testInput)) {
-            console.log(`\nRunning ${day} with testdata:`);
+            console.log(`\nRunning ${day.replace('./', '')} with testdata:`);
             run(dayModule, testInput, testAnswer);
         }
         if (isValid(input) && !test) {
-            console.log(`\nRunning ${day} with REAL data:`);
+            console.log(`\nRunning ${day.replace('./', '')} with REAL data:`);
             run(dayModule, input, realAnswer);
         }
     }
@@ -95,7 +104,10 @@ const registerDay = (day) => {
     return result;
 }
 
-const getDay = (day) => {
+const cleanDay = (day) => day.replace('./', '');
+
+const getDay = (dayName) => {
+    const day = cleanDay(dayName);
     if (!days[day]) {
         return registerDay(day);
     }
@@ -147,16 +159,16 @@ fs.readdir('./', { withFileTypes: true }, (e, files) => {
 })
 
 fs.watch('./', { persistent: true, encoding: 'utf8' }, debounceFile((filePath) => {
-    if (filePath == 'answers.js') {
+    if (filePath.includes('answers.js')) {
         console.clear();
         console.log('\nReload answers\n');
         answers = loadJs('./answers.js');
         Object.values(days).forEach(d => d.execute());
     }
-    else if (filePath.includes('.js') && filePath!=='aoc.js') {
+    else if (filePath.includes('.js') && filePath !== 'aoc.js') {
         console.clear();
-        console.log('\nReload '+filePath+'\n');
-        removeCache('./'+filePath);
+        console.log('\nReload ' + filePath + '\n');
+        removeCache('./' + filePath);
         Object.values(days).forEach(d => d.reloadMain());
     }
 }));
