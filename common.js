@@ -31,13 +31,15 @@ const extent = (points) => {
     }, { width: 0, height: 0, top: 9999999, left: 9999999 });
 }
 
+const extentArray = (lines) => ({ top: 0, left: 0, width: lines[0].length, height: lines.length });
+
 const extentLines = (points) => {
-    return points.reduce(({ top, left, width, height }, {x1,y1,x2,y2}) => {
+    return points.reduce(({ top, left, width, height }, { x1, y1, x2, y2 }) => {
         return {
-            top: Math.min(top, y1,y2),
-            left: Math.min(left, x1,x2),
-            width: Math.max(width, x1,x2),
-            height: Math.max(height, y1,y2)
+            top: Math.min(top, y1, y2),
+            left: Math.min(left, x1, x2),
+            width: Math.max(width, x1, x2),
+            height: Math.max(height, y1, y2)
         }
     }, { width: 0, height: 0, top: 9999999, left: 9999999 });
 }
@@ -51,11 +53,11 @@ const expand = ({ top, left, width, height }, size = 1) => ({
 
 const gridLoop = ({ top = 0, left = 0, width, height }, cb, arr = []) => {
     const grid = [];
-    for (y = top; y <= height; y++) {
+    for (y = top; y < height; y++) {
         const line = [];
-        for (x = left; x <= width; x++) {
-            const pos = (y * width) + x;
-            line.push(cb(pos, x, y, arr[pos]));
+        for (x = left; x < width; x++) {
+            //const pos = (y * width) + x;
+            line.push(cb(x, y, arr[y][x]));
         }
         //console.log(y);
         grid.push(line);
@@ -75,12 +77,21 @@ const makeGrid = (width, height, fill = 0) => {
 
 const manhattan = ([x0, y0], [x1, y1]) => Math.abs(x1 - x0) + Math.abs(y1 - y0);
 
-const getResultAfter = (nr,fn) => {
+const getResultAfter = (nr, fn) => {
     let c = 0;
     for (var j = 0; j < nr; j++) {
         c = fn();
     }
     return c;
+}
+
+const getClosest = ({ width, height, top, left }) => (x, y) => {
+    const pos = [];
+    if (x > top) pos.push({ x: x - 1, y });
+    if (y > left) pos.push({ x, y: y - 1 });
+    if (x < width - 1) pos.push({ x: x + 1, y });
+    if (y < height - 1) pos.push({ x, y: y + 1 });
+    return pos;
 }
 
 module.exports = {
@@ -96,6 +107,8 @@ module.exports = {
     makeGrid,
     extent,
     extentLines,
+    extentArray,
     formatGrid,
+    getClosest,
     expand
 }
