@@ -15,27 +15,26 @@ const getLow = (data) => {
     }, data).flat();
 }
 
-const part1 = (data) => {
-    return getLow(data).map(d => d.value + 1).reduce(add, 0);
-}
+const part1 = (data) => getLow(data)
+    .map(d => d.value + 1)
+    .reduce(add, 0);
 
 const part2 = (map) => {
 
-    const size = extentArray(map);
-    const getClose = getClosest(size);
+    const getClose = getClosest(extentArray(map));
 
-    const walk = (x, y) => {
+    const walk = ({x, y}) => {
         if (map[y][x] < excludeNr) {
             currentSize++;
             map[y][x] = excludeNr
-            getClose(x, y).forEach(i => walk(i.x, i.y));
+            getClose(x, y).forEach(walk);
         }
     }
 
     let basins = [], currentSize = 0;
-    getLow(map).map(({ x, y }) => {
+    getLow(map).map((p) => {
         currentSize = 0;
-        walk(x, y);
+        walk(p);
         basins.push(currentSize);
     })
 
