@@ -41,13 +41,17 @@ const run = ({ transform, part1, part2 }, input, [answerA, answerB]) => {
     }
 }
 
+const removeCache = (file) => {
+    const jsFile = fs.realpathSync(file);
+    const isLoaded = Boolean(require.cache[jsFile]);
+    if (isLoaded) {
+        delete require.cache[jsFile];
+    }
+}
+
 const loadJs = (file, cb) => {
     try {
-        const jsFile = fs.realpathSync(file);
-        const isLoaded = Boolean(require.cache[jsFile]);
-        if (isLoaded) {
-            delete require.cache[jsFile];
-        }
+        removeCache(file);
         return require(file);
     }
     catch (err) {
@@ -115,30 +119,46 @@ getDay('day' + currentDate);
 
 function debounceFile(func, timeout = 300) {
     let timer;
-    return (_, file) => {
-        if (file.includes('git'))
+    return (e, file) => {
+        if (!file || file.includes('git'))
             return;
         clearTimeout(timer);
         timer = setTimeout(() => { func.apply(this, [file]); }, timeout);
     };
 }
 
-fs.watch('./', { encoding: 'utf8', recursive: true }, debounceFile((filePath) => {
-    const file = filePath.replace('\\', '/');
-    if (file.replace('\\', '/').includes('/') && file.includes('day')) {
+
+const watchDay = (day) => {
+    fs.watch(day, { persistent: false, encoding: 'utf8' }, debounceFile((filePath) => {
         console.clear();
-        const [day, name] = file.split('/');
         const dayFn = getDay(day);
-        if (name.includes('.js'))
+        if (filePath.includes('.js'))
             dayFn.reloadMain();
         else {
             dayFn.reloadData();
         }
-    }
-    else if (file.includes('answers.js')) {
+    }));
+}
+
+fs.readdir('./', { withFileTypes: true }, (e, files) => {
+    files.filter(d => d.isDirectory() && d.name.startsWith('day')).map(({ name }) => {
+        watchDay(`./${name}`);
+    });
+})
+
+fs.watch('./', { persistent: true, encoding: 'utf8' }, debounceFile((filePath) => {
+    if (filePath == 'answers.js') {
         console.clear();
         console.log('\nReload answers\n');
         answers = loadJs('./answers.js');
         Object.values(days).forEach(d => d.execute());
     }
+    else if (filePath.includes('.js') && filePath!=='aoc.js') {
+        console.clear();
+        console.log('\nReload '+filePath+'\n');
+        removeCache('./'+filePath);
+        Object.values(days).forEach(d => d.reloadMain());
+    }
 }));
+
+

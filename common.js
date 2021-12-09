@@ -1,5 +1,3 @@
-const fs = require("fs");
-
 const numbers = (separator = ',') => (input) => input.split(separator).toNumber();
 
 const stepper =
@@ -8,6 +6,8 @@ const stepper =
             items[idx++];
 
 const add = (sum, i) => sum + i;
+const mul = (sum, i) => sum * i;
+const sub = (sum, i) => sum - i;
 
 Array.prototype.toNumber = function () {
     return this.map((d) => d.trim()).filter((d) => d.length).map(Number);
@@ -121,5 +121,7 @@ module.exports = {
     extentArray,
     formatGrid,
     getClosest,
-    expand
+    expand,
+    mul,
+    sub
 }
