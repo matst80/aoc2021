@@ -20,8 +20,8 @@ const run = ({ transform, part1, part2 }, input, [answerA, answerB]) => {
     try {
         const start = Date.now();
         const a = part1(data);
-        const diff = Date.now()-start;
-        console.log(`Part1: `, a, compare(answerA, a),` [${Math.round(diff)}ms]`)
+        const diff = Date.now() - start;
+        console.log(`Part1: `, a, compare(answerA, a), ` [${Math.round(diff)}ms]`)
     }
     catch (err) {
         console.error('Part1', err);
@@ -30,9 +30,9 @@ const run = ({ transform, part1, part2 }, input, [answerA, answerB]) => {
         try {
             const start = Date.now();
             const b = part2(data);
-            const diff = Date.now()-start;
+            const diff = Date.now() - start;
             if (b !== undefined) {
-                console.log(`Part2: `, b, compare(answerB, b),` [${Math.round(diff)}ms]`);
+                console.log(`Part2: `, b, compare(answerB, b), ` [${Math.round(diff)}ms]`);
             }
         }
         catch (err) {
@@ -73,7 +73,7 @@ const registerDay = (day) => {
         }
     }
     let [input, testInput] = getInput(day);
-    let { test=false, ...dayModule } = loadJs(`./${day}/main.js`);
+    let { test = false, ...dayModule } = loadJs(`./${day}/main.js`);
     //execute();
     const result = {
         execute,
@@ -113,15 +113,17 @@ else {
 }
 getDay('day' + currentDate);
 
-function debounce(func, timeout = 300) {
+function debounceFile(func, timeout = 300) {
     let timer;
-    return (...args) => {
+    return (_, file) => {
+        if (file.includes('git'))
+            return;
         clearTimeout(timer);
-        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+        timer = setTimeout(() => { func.apply(this, [file]); }, timeout);
     };
 }
 
-fs.watch('./', { encoding: 'utf8', recursive: true }, debounce((e, filePath) => {
+fs.watch('./', { encoding: 'utf8', recursive: true }, debounceFile((filePath) => {
     const file = filePath.replace('\\', '/');
     if (file.replace('\\', '/').includes('/') && file.includes('day')) {
         console.clear();
