@@ -121,7 +121,7 @@ const part1 = (i) => {
 };
 
 const countLowerAndHigher = (all) => (t) => {
-    return all.filter(a => a >= t).length - all.filter(a => a <= t).length;
+    return { higher: all.filter(a => a > t).length, lower: all.filter(a => a < t).length, score: t };
 }
 
 const part2 = (i) => {
@@ -131,15 +131,16 @@ const part2 = (i) => {
         .map(autoCorrect)
     //.filter((d) => d !== 0)
     //.sort((a, b) => a - b);
-    const diffs = scores.sort((a, b) => countLowerAndHigher(a) - countLowerAndHigher(b));
-    console.log(diffs);
-    return diffs[0];
+    const diffs = scores.map(countLowerAndHigher(scores)).sort((a,b) => Math.abs(a.higher - a.lower)-Math.abs(b.higher - b.lower));
+    //console.log(diffs);
+    return diffs[0].score;
     //return scores[Math.ceil(scores.length / 2)];
 };
 
 // not 1217285163
 // not 161510319
 // to low 1546458444
+// 1546458444
 
 module.exports = {
     transform,
