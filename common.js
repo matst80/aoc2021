@@ -107,6 +107,7 @@ const getClosest = ({ width, height, top, left }, diagonal = false) => (x, y) =>
 
 module.exports = {
     seq,
+    asNumbers:(a, b) => a - b,
     getResultAfter,
     add,
     manhattan,

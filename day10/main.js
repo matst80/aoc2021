@@ -5,18 +5,15 @@ const {
     manhattan,
     stepper,
     numbers,
+    asNumbers,
     add,
 } = require("../common.js");
 
 const transform = (data) =>
     data.split("\n").map((line) => line.trim().split(""));
 
-const parts = [
-    ["(", ")"],
-    ["[", "]"],
-    ["{", "}"],
-    ["<", ">"],
-];
+const startChars = ['(', '[', '{', '<'];
+const endChars = [')', ']', '}', '>'];
 
 const values = {
     ")": 3,
@@ -25,85 +22,63 @@ const values = {
     ">": 25137,
 };
 
-const hasStartChar = (chr) => parts.some(([s]) => s === chr);
+const hasStartChar = (chr) => startChars.includes(chr);
 
-const endChar = (start) => parts.find(([s]) => s === start)[1];
+const endChar = (chr) => endChars[startChars.indexOf(chr)];
 
 const removeIncorrect = (line) => {
     const len = line.length;
 
-    let pos = 0,
-        walked = [];
-    (started = []), (char = undefined);
+    let pos = 0;
+    const started = [];
 
     const walk = () => {
         if (pos < len) {
-            char = line[pos++];
+            const char = line[pos++];
             if (hasStartChar(char)) {
                 started.push(char);
-                walked.push(char);
-                return walk();
-            } else if (endChar(started[started.length - 1]) === char) {
-                walked.push(char);
-                started.pop();
                 return walk();
             } else {
-                return;
+                if (endChar(started.pop()) === char) {
+                    return walk();
+                }
             }
+            return char;
         }
     };
-    walk();
+    const last = walk();
 
-    if (pos !== len) {
-        return values[char];
-    }
-    return 0;
-};
-
-const autoCompleteValues = {
-    ")": 1,
-    "]": 2,
-    "}": 3,
-    ">": 4,
+    return (pos !== len) ? values[last] : 0;
 };
 
 const autoCorrect = (line) => {
 
     let pos = 0;
     let walked = [];
-    let started = [];
-    let corrected = [];
     let added = 0;
-    let char = undefined;
 
-    //console.log("starting line", line);
     const walk = () => {
+        if (walked.length > 0 || pos <= line.length) {
+            const char = line[pos];
 
-        if (started.length > 0 || pos <= line.length) {
-            char = line[pos];
-
-            //console.log('testing',char,pos, corrected.join(''), pos, line.length);
             if (hasStartChar(char)) {
-                started.push(char);
                 walked.push(char);
                 pos++;
                 walk();
             } else {
-                if (started.length === 0)
+                if (walked.length === 0)
                     return;
 
-                const shouldBe = endChar(started[started.length - 1]);
+                const shouldBe = endChar(walked[walked.length - 1]);
                 if (shouldBe === char) {
-                    walked.push(char);
-                    started.pop();
+                    walked.pop();
                     pos++;
                     walk();
                 } else {
-                    corrected.push(shouldBe);
-                    line.splice(pos, 0, shouldBe);
+                    line.push(shouldBe);
+                    //line.splice(pos, 0, shouldBe); // this could autocorrect even invalid strings
 
-                    added *= 5;
-                    added += autoCompleteValues[shouldBe];
+                    added = added * 5 + (endChars.indexOf(shouldBe) + 1);
 
                     walk();
                 }
@@ -115,37 +90,19 @@ const autoCorrect = (line) => {
     return added;
 };
 
-const part1 = (i) => {
-
-    return i.map(removeIncorrect).reduce(add, 0);
-};
-
-const countLowerAndHigher = (all) => (t) => {
-    return { higher: all.filter(a => a >= t).length, lower: all.filter(a => a <= t).length, score: t };
-}
+const part1 = (i) => i.map(removeIncorrect).reduce(add, 0);
 
 const part2 = (i) => {
-    
-
     const scores = i
+        .filter(j => removeIncorrect(j) === 0)
         .map(autoCorrect)
-        .sort((a, b) => a - b);
+        .sort(asNumbers);
 
-    const diffs = scores.map(countLowerAndHigher(scores)).sort((a,b) => Math.abs(a.higher - a.lower)-Math.abs(b.higher - b.lower));
-    
-    console.log(diffs.length, diffs.filter(d=>d.lower==55));
-    return diffs[0].score;
-    //return scores[Math.ceil(scores.length / 2)];
+    return scores[Math.round((scores.length - 1) / 2)];
 };
-
-// not 1217285163
-// not 161510319
-// to low 1546458444
-// 1546458444
 
 module.exports = {
     transform,
     part1,
-    part2,
-    test: 0,
+    part2
 };
