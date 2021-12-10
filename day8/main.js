@@ -13,7 +13,7 @@ const getUnknown = (arr, known) => {
 }
 
 const groupByLengths = (arr) => arr.reduce((sum, i) => {
-    return { ...sum, [i.length]: [...sum[i.length] ?? [], i] }
+    return { ...sum, [i.length]: [...sum[i.length] || [], i] }
 }, {});
 
 const hasAll = (...match) => (str) => str.split('').every(i => {

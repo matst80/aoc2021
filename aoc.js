@@ -75,7 +75,7 @@ const registerDay = (day) => {
     let count = 0;
     const execute = () => {
         console.log('-------- ' + (++count) + ' --------');
-        const [testAnswer = [], realAnswer = []] = answers[day] ?? [];
+        const [testAnswer = [], realAnswer = []] = answers[day] || [];
         if (isValid(testInput)) {
             console.log(`\nRunning ${day.replace('./', '')} with testdata:`);
             run(dayModule, testInput, testAnswer);
