@@ -1,8 +1,6 @@
-const { seq, gridLoop, extentArray, getClosest, makeGrid, formatGrid, count } = require('../common.js');
+const { extentArray, getClosest, makeGrid, formatGrid, count } = require('../common.js');
 
 const transform = () => makeGrid(5, 5);
-
-
 
 const part1 = (i) => {
     const size = extentArray(i);
