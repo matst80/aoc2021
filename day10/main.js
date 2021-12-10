@@ -9,7 +9,7 @@ const {
 } = require("../common.js");
 
 const transform = (data) =>
-    data.split("\r\n").map((line) => line.trim().split(""));
+    data.split("\n").map((line) => line.trim().split(""));
 
 const parts = [
     ["(", ")"],
@@ -121,18 +121,19 @@ const part1 = (i) => {
 };
 
 const countLowerAndHigher = (all) => (t) => {
-    return { higher: all.filter(a => a > t).length, lower: all.filter(a => a < t).length, score: t };
+    return { higher: all.filter(a => a >= t).length, lower: all.filter(a => a <= t).length, score: t };
 }
 
 const part2 = (i) => {
-    //return autoCorrect('[({(<(())[]>[[{[]{<()<>>'.split(''));
+    
 
     const scores = i
         .map(autoCorrect)
-    //.filter((d) => d !== 0)
-    //.sort((a, b) => a - b);
+        .sort((a, b) => a - b);
+
     const diffs = scores.map(countLowerAndHigher(scores)).sort((a,b) => Math.abs(a.higher - a.lower)-Math.abs(b.higher - b.lower));
-    //console.log(diffs);
+    
+    console.log(diffs.length, diffs.filter(d=>d.lower==55));
     return diffs[0].score;
     //return scores[Math.ceil(scores.length / 2)];
 };
