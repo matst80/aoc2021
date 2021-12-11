@@ -17,6 +17,8 @@ Array.prototype.trim = function () {
     return this.map(d => d.trim()).filter(d => d && d.length);
 }
 
+const log = console.log;
+
 const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 const lower = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
@@ -111,6 +113,7 @@ module.exports = {
     stepper,
     numbers,
     chars,
+    log,
     gridLoop,
     count,
     lower,

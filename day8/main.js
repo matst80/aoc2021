@@ -59,14 +59,9 @@ const parseLine = ([test, toDisplay]) => {
 
 const transform = (input) => input.split('\n').map(line => line.split('|').map(d => d.split(' ').trim()));
 
-const part1 = (i) => {
-    const lengthsToFind = [2, 4, 3, 7];
-    return i.map(([_, p2]) => p2).flat().reduce(countLengths(lengthsToFind), 0);
-}
+const part1 = (i) => i.map(([_, p2]) => p2).flat().reduce(countLengths([2, 4, 3, 7]), 0);
 
-const part2 = (i) => {
-    return i.map(parseLine).reduce(add, 0);
-}
+const part2 = (i) => i.map(parseLine).reduce(add, 0);
 
 module.exports = {
     transform, part1, part2
