@@ -21,6 +21,10 @@ Array.prototype.last = function () {
     return this[this.length - 1];
 }
 
+Array.prototype.sum = function () {
+    return this.reduce(add, 0);
+}
+
 const log = console.log;
 
 const count = (nr) => (line) => line.reduce((sum, i) => sum + ((i === nr) ? 1 : 0), 0);

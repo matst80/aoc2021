@@ -1,21 +1,20 @@
 const {
     seq,
     numbers,
-    add,
 } = require("../common.js");
 
 const transform = numbers(" ");
 
 const part1 = (i) => {
     let pos = 0;
+    const get = () => i[pos++];
 
     const walk = () => {
-        const childNodes = i[pos++];
-        const metadataEntries = i[pos++];
+        const [childNodes, metadata] = [get(), get()];
         let value = 0;
 
-        seq(childNodes).forEach(() => (value += walk()));
-        seq(metadataEntries).forEach(() => (value += i[pos++]));
+        seq(childNodes).forEach(() => value += walk());
+        seq(metadata).forEach(() => value += get());
 
         return value;
     };
@@ -25,26 +24,26 @@ const part1 = (i) => {
     return v;
 };
 
+const over = (limit) => (nr) => nr > limit;
+
 const part2 = (i) => {
 
     let pos = 0;
+    const get = () => i[pos++];
 
     const walk = () => {
-        const childNodes = i[pos++];
-        const metadataEntries = i[pos++];
+        const [childNodes, metadata] = [get(), get()];
 
         children = seq(childNodes).map(walk);
 
         const trans = childNodes === 0
-            ? (a) => a
+            ? (d) => d
             : (d) => children[d - 1] || 0;
 
-        return seq(metadataEntries)
-            .map(() => i[pos++])
-            .filter((d) => d > 0)
-            .map(trans)
-            .reduce(add, 0);
-
+        return seq(metadata)
+            .map(get)
+            .filter(over(0))
+            .map(trans).sum();
     };
 
     return walk();
