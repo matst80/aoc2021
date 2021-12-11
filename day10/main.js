@@ -1,6 +1,6 @@
-const { asNumbers, add, stringGrid } = require("../common.js");
+const { asNumbers, add, charGrid } = require("../common.js");
 
-const transform = stringGrid;
+const transform = charGrid;
 
 const startChars = ["(", "[", "{", "<"];
 const endChars = [")", "]", "}", ">"];

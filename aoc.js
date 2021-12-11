@@ -14,7 +14,7 @@ const getInput = (day) => {
     ];
 }
 
-const run = ({ transform, part1, part2 }, input, [answerA, answerB]) => {
+const run = ({ transform, part1, part2 }, input, [answerA, answerB], isTest) => {
     const data = clone(transform ? transform(input) : input);
     const reset = '\x1b[0m';
     const compare = (a, b) => a !== undefined
@@ -25,7 +25,7 @@ const run = ({ transform, part1, part2 }, input, [answerA, answerB]) => {
 
     try {
         const start = Date.now();
-        const a = part1(data);
+        const a = part1(data, isTest);
         const diff = Date.now() - start;
         const { text, color } = compare(answerA, a);
         console.log(`Part1: `, a, color, text, reset, `${Math.round(diff)}ms`)
@@ -36,7 +36,7 @@ const run = ({ transform, part1, part2 }, input, [answerA, answerB]) => {
     if (part2) {
         try {
             const start = Date.now();
-            const b = part2(data);
+            const b = part2(data, isTest);
             const diff = Date.now() - start;
             const { text, color } = compare(answerB, b);
             if (b !== undefined) {
@@ -82,7 +82,7 @@ const registerDay = (day) => {
         const [testAnswer = [], realAnswer = []] = answers[day] || [];
         if (isValid(testInput)) {
             console.log(`\nRunning ${day.replace('./', '')} with testdata:`);
-            run(dayModule, testInput, testAnswer);
+            run(dayModule, testInput, testAnswer, true);
         }
         if (isValid(input) && !test) {
             console.log(`\nRunning ${day.replace('./', '')} with REAL data:`);

@@ -40,10 +40,10 @@ const part1 = (i) => {
     const size = extentArray(i);
     const getClose = getClosest(size, true);
     const setValue = (value) => ({ x, y }) => i[y][x] = value;
-    getClose(2, 2).forEach(setValue(1));
-    console.log(formatGrid(i));
-    const cnt = count(i.flat());
-    return cnt(1);
+    getClose({x:2, y:2}).forEach(setValue(1));
+    console.log(formatGrid(i,d=>d===1));
+    const cnt = count(1);
+    return cnt(i.flat());
 }
 
 const part2 = (i) => {

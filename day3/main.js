@@ -1,10 +1,5 @@
 const {
-  seq,
-  chars,
-  lower,
-  manhattan,
-  stepper,
-  numbers,
+  seq
 } = require("../common.js");
 
 const matchIdx = (idx, find) => (i) => i[idx] === find;

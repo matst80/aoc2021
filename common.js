@@ -47,8 +47,8 @@ const extentLines = (points) => {
         return {
             top: Math.min(top, y1, y2),
             left: Math.min(left, x1, x2),
-            width: Math.max(width, x1, x2),
-            height: Math.max(height, y1, y2)
+            width: Math.max(width, x1+1, x2+1),
+            height: Math.max(height, y1+1, y2+1)
         }
     }, { width: 0, height: 0, top: 9999999, left: 9999999 });
     return { ...size, size: (size.height - size.top) * (size.width - size.left) };
@@ -76,12 +76,12 @@ const gridLoop = ({ top = 0, left = 0, width, height }, cb, arr = []) => {
 }
 
 addColorAndJoin = (mark) => (line) => {
-    return line.map(d => d === mark ? `\x1b[1m${mark}\x1b[0m` : d).join('')
+    return line.map(d => mark&&mark(d) ? `\x1b[1m${d}\x1b[0m` : d).join('')
 }
 
 const asNumbers = (a, b) => a - b;
 
-const formatGrid = (grid, highlight = 0) => grid.map(addColorAndJoin(highlight)).join('\n');
+const formatGrid = (grid, highlight) => grid.map(addColorAndJoin(highlight)).join('\n');
 
 const seq = (l) => new Array(l).fill(0).map((_, i) => i);
 
@@ -119,14 +119,20 @@ const getClosest = ({ width, height, top, left }, diagonal = false) => ({ x, y }
     return pos;
 }
 
-const stringGrid = a => a.split('\n').map(d => d.trim().split(''));
+const charGrid = a => a.split('\n').map(d => d.trim().split(''));
 
 const numberGrid = a => a.split('\n').map(d => d.trim().split('').toNumber());
 
 const byLength = (a, b) => a.length - b.length;
 
+const tlog = (isTest) => (...args) => {
+    if (isTest) {
+        console.log(...args);
+    }
+}
+
 module.exports = {
-    stringGrid,
+    charGrid,
     seq,
     numberGrid,
     asNumbers: (a, b) => a - b,
@@ -136,6 +142,7 @@ module.exports = {
     stepper,
     numbers,
     chars,
+    tlog,
     log,
     gridLoop,
     lower,

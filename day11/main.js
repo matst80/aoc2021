@@ -43,12 +43,12 @@ const part1 = (i) => {
     const { step, map } = parser(i);
     const { flashes } = seq(100).map(step).last();
 
-    // printGrid(map);
+    printGrid(map);
 
     return flashes;
 }
 
-const printGrid = (map) => log(formatGrid(map));
+const printGrid = (map) => log(formatGrid(map, d=>d===0));
 
 const part2 = (d) => {
 

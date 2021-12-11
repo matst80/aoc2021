@@ -1,6 +1,6 @@
-const { add, gridLoop, extentArray, getClosest, getValueAtPosition, asNumbers } = require('../common.js');
+const { add, gridLoop, extentArray, getClosest, getValueAtPosition, asNumbers, numberGrid } = require('../common.js');
 
-const transform = input => input.split('\n').map(d => d.trim().split('').toNumber());
+const transform = numberGrid
 
 const excludeNr = 9;
 
