@@ -119,11 +119,14 @@ const getClosest = ({ width, height, top, left }, diagonal = false) => ({ x, y }
     return pos;
 }
 
+const stringGrid = a => a.split('\n').map(d => d.trim().split(''));
+
 const numberGrid = a => a.split('\n').map(d => d.trim().split('').toNumber());
 
 const byLength = (a, b) => a.length - b.length;
 
 module.exports = {
+    stringGrid,
     seq,
     numberGrid,
     asNumbers: (a, b) => a - b,
