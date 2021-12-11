@@ -1,4 +1,4 @@
-const { add, gridLoop, extentArray, getClosest, getValueAtPosition } = require('../common.js');
+const { add, gridLoop, extentArray, getClosest, getValueAtPosition, asNumbers } = require('../common.js');
 
 const transform = input => input.split('\n').map(d => d.trim().split('').toNumber());
 
@@ -9,7 +9,7 @@ const getLow = (data) => {
     const getClose = getClosest(size);
     const get = getValueAtPosition(data);
     return gridLoop(size, (x, y, value) => {
-        const close = getClose(x, y).map(get).every(a => a > value);
+        const close = getClose({x, y}).map(get).every(a => a > value);
         return close ? { x, y, value } : -1;
     }, data).flat();
 }
@@ -19,14 +19,15 @@ const part1 = (data) => getLow(data)
     .reduce(add, 0);
 
 const part2 = (map) => {
-
     const getClose = getClosest(extentArray(map));
+    const get = ({x,y}) => map[y][x];
+    const exclude = ({x,y}) => map[y][x] = excludeNr;
 
-    const walk = ({x, y}) => {
-        if (map[y][x] < excludeNr) {
+    const walk = (p) => {
+        if (get(p) < excludeNr) {
             currentSize++;
-            map[y][x] = excludeNr
-            getClose(x, y).forEach(walk);
+            exclude(p);
+            getClose(p).forEach(walk);
         }
     }
 
@@ -37,7 +38,7 @@ const part2 = (map) => {
         return currentSize;
     })
 
-    const [a, b, c] = basins.sort((a, b) => b - a);
+    const [a, b, c] = basins.sort(asNumbers).reverse();
 
     return a * b * c;
 }

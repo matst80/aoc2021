@@ -30,17 +30,6 @@ const draw = (grid, width, drawDiagonal) => ({ x1, y1, xs, ys, length }) => {
 
 const countMultiples = (sum, i) => (i > 1) ? sum + 1 : sum;
 
-
-const printGrid = (grid) => {
-    for (y = 0; y <= height; y++) {
-        let line = [];
-        for (x = 0; x < width; x++) {
-            line.push(grid[y * width + x]);
-        }
-        console.log(line.join(" "));
-    }
-};
-
 const transform = input => input.split('\n').map(splitToCoords);
 
 const part1 = (data) => {

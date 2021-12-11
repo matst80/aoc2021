@@ -15,7 +15,7 @@ const getInput = (day) => {
 }
 
 const run = ({ transform, part1, part2 }, input, [answerA, answerB]) => {
-    const data = transform ? transform(input) : input;
+    const data = clone(transform ? transform(input) : input);
     const reset = '\x1b[0m';
     const compare = (a, b) => a !== undefined
         ? a === b
@@ -70,6 +70,10 @@ const loadJs = (file, cb) => {
 
 const days = {};
 let answers = require('./answers');
+
+function clone(a) {
+    return JSON.parse(JSON.stringify(a));
+ }
 
 const registerDay = (day) => {
     let count = 0;

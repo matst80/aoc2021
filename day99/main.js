@@ -49,7 +49,7 @@ const part1 = (i) => {
 const part2 = (i) => {
     const stringPipe = new Pipe(['11233', '12', 22, true]).number().filter(v => v > 12);
     console.log('string value: ' + stringPipe);
-    return stringPipe;
+    return stringPipe+'';
 }
 
 module.exports = {
