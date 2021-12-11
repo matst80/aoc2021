@@ -40,8 +40,7 @@ const part2 = (i) => {
             ? (d) => d
             : (d) => children[d - 1] || 0;
 
-        return seq(metadata)
-            .map(get)
+        return seq(metadata).map(get)
             .filter(over(0))
             .map(trans).sum();
     };
