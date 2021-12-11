@@ -48,12 +48,12 @@ const part1 = (i) => {
     return flashes;
 }
 
-const printGrid = (map) => log(formatGrid(map, d=>d===0));
+const printGrid = (map) => log(formatGrid(map, d => d === 0));
 
 const part2 = (d) => {
 
     const { step, size: { size }, map } = parser(d);
-    
+
     const countZeros = count(0);
 
     let flashStep = 0;
