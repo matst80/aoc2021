@@ -1,34 +1,34 @@
 const { seq, log } = require("../common.js");
 const { Graph } = require("../graph.js");
 
-const transform = (input) =>
-    Graph(input
+const transform = (input) => {
+    const graph = Graph(input
         .split("\n")
         .trim()
         .map((line) => {
             const [from, to] = line.split("-").trim();
             return { from, to };
         }), defaultOptions);
+    return { graph, start: graph.getNode('start') }
+}
 
 const isLower = (a) => a === a.toLowerCase();
-
-const START = "start";
 
 const defaultOptions = {
     nodeParser: (node) => ({
         ...node,
         isLarge: !isLower(node.id),
-        edge: node.id === START || node.id === "end",
+        edge: node.id === 'start' || node.id === "end",
     }),
     historyParser: (all, next) => {
         return (next.isLarge) ? all : [...all, next.id];
     }
 };
 
-const part1 = (graph) => {
+const part1 = ({graph,start}) => {
     let count = 0;
 
-    graph.traverse(graph.getNode(START), ({ id, isLarge, edge }, _, history) => {
+    graph.traverse(start, ({ id, isLarge, edge }, _, history) => {
         if (id == "end") {
             count++;
             return false;
@@ -38,18 +38,15 @@ const part1 = (graph) => {
     return count;
 };
 
-const part2 = (graph) => {
+const part2 = ({graph,start}) => {
     let count = 0;
-
-    graph.traverse(graph.getNode(START), ({ id, isLarge, edge }, _, history) => {
+    graph.traverse(start, ({ id, isLarge, edge }, _, history) => {
         if (id == "end") {
             count++;
             return false;
         }
 
-        const hasVisitedSmall = history.some((i, pos) => history.indexOf(i) !== pos);
-
-        return !edge && (isLarge || history.indexOf(id) === -1 || !hasVisitedSmall);
+        return !edge && (isLarge || history.indexOf(id) === -1 || !history.some((i, pos) => history.indexOf(i) !== pos));
     });
     return count;
 };

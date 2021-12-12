@@ -26,6 +26,7 @@ const Graph = (edges, { nodeParser, historyParser } = {}) => {
 
     const traverse = (node, cb, history = []) => {
         const state = {};
+        
         node.relations.forEach(({ id }) => {
             const relation = getNode(id);
             const path = historyParser !== undefined ? historyParser(history, node) : [...history, node];
