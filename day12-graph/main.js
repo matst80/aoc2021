@@ -37,7 +37,7 @@ const part1 = (lines) => {
 const part2 = (lines) => {
     const graph = Graph(lines, {
         ...defaultOptions, historyParser: (all, next) => {
-            return (next.isLarge)? all:[...all,next];
+            return (next.isLarge) ? all : [...all, next.id];
         }
     });
     let count = 0;
@@ -50,7 +50,7 @@ const part2 = (lines) => {
 
         const hasVisitedSmall = history.some((i, pos) => history.indexOf(i) !== pos);
 
-        return !edge && (isLarge || !history.some(d => d.id === id) || !hasVisitedSmall);
+        return !edge && (isLarge || history.indexOf(id) === -1 || !hasVisitedSmall);
     });
     return count;
 };
