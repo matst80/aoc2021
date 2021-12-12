@@ -12,15 +12,17 @@ const transform = (input) => {
 
 const isLower = (a) => a === a.toLowerCase();
 
+const START = 'start';
+
 const walker = (lines, allowVisits) => {
     let paths = [...lines];
 
     const get = (from) =>
         paths
             .filter(([a, b]) => a === from || b === from)
-            .map(([a, b]) => (from === a ? b : a)).filter(d => d !== 'start');
+            .map(([a, b]) => (from === a ? b : a)).filter(d => d !== START);
 
-    let toVisit = [{ current: "start", visited: [], canVisit: allowVisits }];
+    let toVisit = [{ current: START, visited: [], canVisit: allowVisits }];
     let count = 0;
 
     while (toVisit.length > 0) {
