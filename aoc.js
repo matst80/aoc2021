@@ -15,7 +15,7 @@ const getInput = (day) => {
 }
 
 const run = ({ transform, part1, part2 }, input, [answerA, answerB], isTest) => {
-    const data = clone(transform ? transform(input) : input);
+    const data = transform ? transform(clone(input)) : input;
     const reset = '\x1b[0m';
     const compare = (a, b) => a !== undefined
         ? a === b
