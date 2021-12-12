@@ -28,8 +28,8 @@ const Graph = (edges, { nodeParser } = {}) => {
     const nodes = nodeIds.map(id => {
         const parents = edges.filter(d => d.to === id).map(d => ({ id: d.from, type: 'parent' }));
         const children = edges.filter(d => d.from === id).map(d => ({ id: d.to, type: 'child' }));
-        const node = { id, relations: [...children, ...parents] }
-        return nodeParser!==undefined ? nodeParser(node) : node;
+        const node = { id, relations: [...children, ...parents], edge: (children.length === 0) }
+        return nodeParser !== undefined ? nodeParser(node) : node;
     });
 
     const getNode = (id) => nodes.find(d => d.id === id);
@@ -39,7 +39,7 @@ const Graph = (edges, { nodeParser } = {}) => {
         node.relations.forEach(({ id }) => {
             const relation = getNode(id);
             const path = [...history, node.id];
-            if (cb(node, relation, path)) {
+            if (cb(relation, node, path)) {
                 traverse(relation, cb, path);
             }
         });
@@ -56,40 +56,36 @@ const isLower = (a) => a === a.toLowerCase();
 const START = 'start';
 
 const defaultOptions = {
-    nodeParser: (node) => {
-        return { ...node, isLarge: !isLower(node.id), edge:node.id===START || node.id==='end' }
-    }
-};
-
-const part2 = (lines) => {
-    const graph = Graph(lines, defaultOptions);
-    let count = 0;
-    
-    graph.traverse(graph.getNode(START), (parent, relation, history) => {
-        
-        if (relation.id === 'end') {
-            count++;
-            return false;
-        }
-        const allSmall = history.filter(isLower);
-        const hasVisitedSmall = allSmall.some(i=>allSmall.filter(j=>j===i).length>1);
-        
-        return !relation.edge && (relation.isLarge || !history.includes(relation.id) || !hasVisitedSmall);
-    });
-    return count;
+    nodeParser: (node) => ({ ...node, isLarge: !isLower(node.id), edge: node.id === START || node.id === 'end' })    
 };
 
 const part1 = (lines) => {
     const graph = Graph(lines, defaultOptions);
     let count = 0;
-    graph.traverse(graph.getNode(START), (parent, relation, history) => {
-        
-        if (relation.id === 'end') {
+    graph.traverse(graph.getNode(START), ({ id, isLarge, edge }, _, history) => {
+        if (id === 'end') {
             count++;
             return false;
         }
-        
-        return !relation.edge && (relation.isLarge || !history.includes(relation.id));
+        return !edge && (isLarge || !history.includes(id));
+    });
+    return count;
+};
+
+const part2 = (lines) => {
+    const graph = Graph(lines, defaultOptions);
+    let count = 0;
+
+    graph.traverse(graph.getNode(START), ({ id, isLarge, edge }, _, history) => {
+
+        if (id === 'end') {
+            count++;
+            return false;
+        }
+        const allSmall = history.filter(isLower);
+        const hasVisitedSmall = allSmall.some(i => allSmall.filter(j => j === i).length > 1);
+
+        return !edge && (isLarge || !history.includes(id) || !hasVisitedSmall);
     });
     return count;
 };
@@ -98,5 +94,5 @@ module.exports = {
     transform,
     part1,
     part2,
-    test: 0,
+    test: 1,
 };
