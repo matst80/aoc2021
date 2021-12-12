@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+const { extentArray, getClosest, makeGrid, formatGrid, count } = require('../common.js');
+
+const transform = () => makeGrid(5, 5);
+
+=======
 const { seq, gridLoop, extentArray, getClosest, makeGrid, formatGrid, count,log } = require('../common.js');
 
 const transform = () => makeGrid(5, 5);
@@ -36,6 +42,7 @@ Pipe.prototype.filter = function (fn) {
     return this.setOutput(output);
 }
 
+>>>>>>> c44669244dd3f6f62f17ae7664db087f29d238d0
 const part1 = (i) => {
     const size = extentArray(i);
     const getClose = getClosest(size, true);
