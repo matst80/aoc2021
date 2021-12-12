@@ -25,7 +25,7 @@ const defaultOptions = {
     }
 };
 
-const part1 = ({graph,start}) => {
+const part1 = ({ graph, start }) => {
     let count = 0;
 
     graph.traverse(start, ({ id, isLarge, edge }, _, history) => {
@@ -38,7 +38,7 @@ const part1 = ({graph,start}) => {
     return count;
 };
 
-const part2 = ({graph,start}) => {
+const part2 = ({ graph, start }) => {
     let count = 0;
     graph.traverse(start, ({ id, isLarge, edge }, _, history) => {
         if (id == "end") {
