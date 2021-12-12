@@ -35,7 +35,11 @@ const part1 = (lines) => {
 };
 
 const part2 = (lines) => {
-    const graph = Graph(lines, defaultOptions);
+    const graph = Graph(lines, {
+        ...defaultOptions, historyParser: (all, next) => {
+            return (next.isLarge)? all:[...all,next];
+        }
+    });
     let count = 0;
 
     graph.traverse(graph.getNode(START), ({ id, isLarge, edge }, _, history) => {
@@ -43,8 +47,8 @@ const part2 = (lines) => {
             count++;
             return false;
         }
-        const smallCaves = history.filter(d => !d.isLarge);
-        const hasVisitedSmall = smallCaves.some((i, pos) => smallCaves.indexOf(i) !== pos);
+
+        const hasVisitedSmall = history.some((i, pos) => history.indexOf(i) !== pos);
 
         return !edge && (isLarge || !history.some(d => d.id === id) || !hasVisitedSmall);
     });

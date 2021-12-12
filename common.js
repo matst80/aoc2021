@@ -9,49 +9,49 @@ const add = (sum, i) => sum + i;
 const mul = (sum, i) => sum * i;
 const sub = (sum, i) => sum - i;
 
-const Graph = (edges, { nodeParser } = {}) => {
+const Graph = (edges, { nodeParser, historyParser } = {}) => {
     const nodeIds = edges.reduce((all, i) => {
-      const r = [];
-      if (!all.includes(i.from)) r.push(i.from);
-      if (!all.includes(i.to)) r.push(i.to);
-      return [...all, ...r];
+        const r = [];
+        if (!all.includes(i.from)) r.push(i.from);
+        if (!all.includes(i.to)) r.push(i.to);
+        return [...all, ...r];
     }, []);
-  
+
     const nodes = nodeIds.map((id) => {
-      const parents = edges
-        .filter((d) => d.to === id)
-        .map((d) => ({ id: d.from, type: "parent" }));
-      const children = edges
-        .filter((d) => d.from === id)
-        .map((d) => ({ id: d.to, type: "child" }));
-      const node = {
-        id,
-        relations: [...children, ...parents],
-        edge: children.length === 0,
-      };
-      return nodeParser !== undefined ? nodeParser(node) : node;
+        const parents = edges
+            .filter((d) => d.to === id)
+            .map((d) => ({ id: d.from, type: "parent" }));
+        const children = edges
+            .filter((d) => d.from === id)
+            .map((d) => ({ id: d.to, type: "child" }));
+        const node = {
+            id,
+            relations: [...children, ...parents],
+            edge: children.length === 0,
+        };
+        return nodeParser !== undefined ? nodeParser(node) : node;
     });
-  
+
     const getNode = (id) => nodes.find((d) => d.id === id);
-  
+
     const traverse = (node, cb, history = []) => {
-      const state = {};
-      node.relations.forEach(({ id }) => {
-        const relation = getNode(id);
-        const path = [...history, node];
-        if (cb(relation, node, path)) {
-          traverse(relation, cb, path);
-        }
-      });
-      return state;
+        const state = {};
+        node.relations.forEach(({ id }) => {
+            const relation = getNode(id);
+            const path = historyParser !== undefined ? historyParser(history, node) : [...history, node];
+            if (cb(relation, node, path)) {
+                traverse(relation, cb, path);
+            }
+        });
+        return state;
     };
-  
+
     return {
-      getNode,
-      nodes,
-      traverse,
+        getNode,
+        nodes,
+        traverse,
     };
-  };
+};
 
 Array.prototype.toNumber = function () {
     return this.map((d) => d.trim()).filter((d) => d.length).map(Number);
@@ -95,8 +95,8 @@ const extentLines = (points) => {
         return {
             top: Math.min(top, y1, y2),
             left: Math.min(left, x1, x2),
-            width: Math.max(width, x1+1, x2+1),
-            height: Math.max(height, y1+1, y2+1)
+            width: Math.max(width, x1 + 1, x2 + 1),
+            height: Math.max(height, y1 + 1, y2 + 1)
         }
     }, { width: 0, height: 0, top: 9999999, left: 9999999 });
     return { ...size, size: (size.height - size.top) * (size.width - size.left) };
@@ -124,7 +124,7 @@ const gridLoop = ({ top = 0, left = 0, width, height }, cb, arr = []) => {
 }
 
 addColorAndJoin = (mark) => (line) => {
-    return line.map(d => mark&&mark(d) ? `\x1b[1m${d}\x1b[0m` : d).join('')
+    return line.map(d => mark && mark(d) ? `\x1b[1m${d}\x1b[0m` : d).join('')
 }
 
 const asNumbers = (a, b) => a - b;
