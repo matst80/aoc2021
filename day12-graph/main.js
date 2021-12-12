@@ -38,13 +38,14 @@ const Graph = (edges, { nodeParser } = {}) => {
     const state = {};
     node.relations.forEach(({ id }) => {
       const relation = getNode(id);
-      const path = [...history, node.id];
+      const path = [...history, node];
       if (cb(relation, node, path)) {
         traverse(relation, cb, path);
       }
     });
     return state;
   };
+
   return {
     getNode,
     traverse,
@@ -71,7 +72,7 @@ const part1 = (lines) => {
       count++;
       return false;
     }
-    return !edge && (isLarge || !history.includes(id));
+    return !edge && (isLarge || !history.some(d=>d.id===id));
   });
   return count;
 };
@@ -85,12 +86,11 @@ const part2 = (lines) => {
       count++;
       return false;
     }
-    const allSmall = history.filter(isLower);
-    const hasVisitedSmall = allSmall.some(
-      (i) => allSmall.filter((j) => j === i).length > 1
-    );
+    const smallCaves = history.filter(d=>!d.isLarge).map(d=>d.id);
 
-    return !edge && (isLarge || !history.includes(id) || !hasVisitedSmall);
+    const hasVisitedSmall = smallCaves.some((i,pos) => smallCaves.indexOf(i)!==pos);
+    
+    return !edge && (isLarge || !history.some(d=>d.id===id) || !hasVisitedSmall);
   });
   return count;
 };
@@ -99,5 +99,5 @@ module.exports = {
   transform,
   part1,
   part2,
-  test: 1,
+  test: 0,
 };
