@@ -1,4 +1,4 @@
-const { seq, log, makeGrid, gridLoop, extentArray, numbers } = require('../common.js');
+const { seq, log, makeGrid, gridLoop, extentArray, numbers, numberGrid, charGrid } = require('../common.js');
 
 const transform = numbers(',');
 
@@ -13,5 +13,5 @@ const part2 = (i) => {
 }
 
 module.exports = {
-    transform, part1, part2
+    transform, part1, part2, test:0
 }
