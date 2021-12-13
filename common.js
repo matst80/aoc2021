@@ -64,12 +64,12 @@ const expand = ({ top, left, width, height }, size = 1) => ({
     height: height + size * 2,
 });
 
-const gridLoop = ({ top = 0, left = 0, width, height }, cb, arr = []) => {
+const gridLoop = ({ top = 0, left = 0, width, height }, cb, arr) => {
     const grid = [];
     for (y = top; y < height; y++) {
         const line = [];
         for (x = left; x < width; x++) {
-            const v = cb(x, y, arr[y][x]);
+            const v = cb(x, y, (arr!==undefined)?arr[y][x]:0);
             if (v !== -1)
                 line.push(v);
         }
@@ -79,7 +79,7 @@ const gridLoop = ({ top = 0, left = 0, width, height }, cb, arr = []) => {
 }
 
 addColorAndJoin = (mark) => (line) => {
-    return line.map(d => mark && mark(d) ? `\x1b[1m${d}\x1b[0m` : d).join('')
+    return line.map(d => mark && mark(d) ? `\x1b[42m${d}\x1b[0m` : d).join('')
 }
 
 const asNumbers = (a, b) => a - b;
