@@ -1,95 +1,60 @@
 const {
-    seq,
-    log,
-    makeGrid,
-    gridLoop,
-    extentArray,
-    numbers,
-    numberGrid,
-    charGrid,
-    extent,
-    formatGrid,
-    tlog,
+  seq,
+  log,
+  makeGrid,
+  gridLoop,
+  extent,
+  formatGrid,
 } = require("../common.js");
+const { foldSwitch } = require("../fold.js");
 
 const transform = (input) => {
-    let hasSplitted = false;
-    const lines = input.split("\n");
-    const coors = [];
-    const folds = [];
-    lines.forEach((d) => {
-        if (d.length < 2) {
-            hasSplitted = true;
-            return;
-        }
-        if (!hasSplitted) {
-            const [x, y] = d.split(",").toNumber();
-            coors.push({ x, y });
-        } else {
-            const [_, direction, nr] = d.match(/ (.)=(\d+)/);
-            folds.push({ direction, nr: Number(nr) });
-        }
-    });
-    return { coors, folds, size: extent(coors) };
-};
-
-const fold = (grid, width, height, addFn) => {
-    const result = makeGrid(width, height);
-    gridLoop({ top: 0, left: 0, height, width }, (x, y, value) => {
-        result[y][x] = (addFn(x, y) + value) > 0 ? 1 : 0;
-    }, grid);
-    return result;
-}
-
-const foldY = (grid, height) => {
-    const orgHeight = grid.length - 1;
-    const diff = (orgHeight / 2 !== height) ? 1 : 0;
-
-    return fold(grid, grid[0].length, height, (x, y) => grid[(orgHeight - diff) - y][x]);
-
-};
-
-const foldX = (grid, width) => {
-    const orgWidth = grid[0].length - 1;
-
-    return fold(grid, width, grid.length, (x, y) => grid[y][orgWidth - x]);
+  let hasSplitted = false;
+  const lines = input.split("\n");
+  const coors = [];
+  const folds = [];
+  lines.forEach((d) => {
+    if (d.length < 2) {
+      hasSplitted = true;
+      return;
+    }
+    if (!hasSplitted) {
+      const [x, y] = d.split(",").toNumber();
+      coors.push({ x, y });
+    } else {
+      const [_, direction, nr] = d.match(/ (.)=(\d+)/);
+      folds.push({ horizonal: direction === "x", nr: Number(nr) });
+    }
+  });
+  return { coors, folds, size: extent(coors) };
 };
 
 const part1 = ({ coors, folds, size }) => {
-    const { width, height } = size;
-    let grid = makeGrid(width + 1, height + 1);
+  const { width, height } = size;
+  let grid = makeGrid(width + 1, height + 1);
 
-    const draw = ({ x, y }) => (grid[y][x] = 1);
-    coors.forEach(draw);
+  coors.forEach(({ x, y }) => (grid[y][x] = 1));
 
-    const [a] = folds;
+  folds.slice(0, 1).forEach((d) => (grid = foldSwitch(d, grid)));
 
-    [a].forEach(({ direction, nr }) => {
-        grid = direction === "y" ? foldY(grid, nr) : foldX(grid, nr);
-    });
-
-    return grid.flat().reduce((sum, i) => sum + (i > 0 ? 1 : 0), 0);
-
+  return grid.flat().reduce((sum, i) => sum + (i > 0 ? 1 : 0), 0);
 };
 
 const part2 = ({ coors, folds, size }) => {
-    const { width, height } = size;
-    let grid = makeGrid(width + 1, height + 1);
+  const { width, height } = size;
+  let grid = makeGrid(width + 1, height + 1);
 
-    const draw = ({ x, y }) => (grid[y][x] = 1);
-    coors.forEach(draw);
+  coors.forEach(({ x, y }) => (grid[y][x] = 1));
 
-    folds.forEach(({ direction, nr }) => {
-        grid = direction === "y" ? foldY(grid, nr) : foldX(grid, nr);
-    });
-    console.log(formatGrid(grid, (d) => d > 0));
+  folds.forEach((d) => (grid = foldSwitch(d, grid)));
+  log(formatGrid(grid, (d) => d > 0));
 
-    return grid.flat().reduce((sum, i) => sum + (i > 0 ? 1 : 0), 0) + 1;
+  return grid.flat().reduce((sum, i) => sum + (i > 0 ? 1 : 0), 0) + 1;
 };
 
 module.exports = {
-    transform,
-    part1,
-    part2,
-    test: 0,
+  transform,
+  part1,
+  part2,
+  test: 0,
 };
