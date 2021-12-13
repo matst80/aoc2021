@@ -32,12 +32,12 @@ const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 const lower = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
 const extent = (points) => {
-    const size = points.reduce(({ top, left, width, height }, [x, y]) => {
+    const size = points.reduce(({ top, left, width, height }, {x, y}) => {
         return {
-            top: Math.min(top, y),
+            top: Math.min(top, y+1),
             left: Math.min(left, x),
             width: Math.max(width, x),
-            height: Math.max(height, y)
+            height: Math.max(height, y+1)
         }
     }, { width: 0, height: 0, top: 9999999, left: 9999999 });
     return { ...size, size: (size.height - size.top) * (size.width - size.left) };
