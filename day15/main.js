@@ -16,9 +16,9 @@ const shortestPath = (map, startPos = { x: 0, y: 0, idx: 0 }) => {
     const { width, height } = extentArray(map);
 
     const isEndPos = ({ x, y }) => (y === height - 1 && x === width - 1);
-    const getCost = ({ x, y }) => map[y][x];
+    const getCost = ({ x, y },prev) => map[y][x]+prev;
     const close = getClosest({ width, height });
-    //const closeReversed = (pos) => close(pos).reverse();
+    //const closeSorted = (pos) => close(pos);
 
     const { cost, path } = aStar(startPos, close, isEndPos, getCost);
     return cost;

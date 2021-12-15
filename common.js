@@ -110,29 +110,29 @@ const aStar = (startPos, getPossibleSteps, isEnd, getCost) => {
     const walked = new Set();
     const toTry = [{ pos: startPos, cost: 0 }];
     while (toTry.length > 0) {
-        const { pos, cost, path=[] } = toTry.shift();
+        const { pos, cost, path = [] } = toTry.shift();
 
         if (isEnd(pos)) {
-            return {cost,path};
+            return { cost, path };
         }
 
         getPossibleSteps(pos)
             .forEach(({ idx, ...p }) => {
                 if (!walked.has(idx)) {
                     walked.add(idx);
-                    toTry.push({ pos: p, cost: cost + getCost(p), path:[...path,p] });
+                    toTry.push({ pos: p, cost: getCost(p,cost), path: [...path, p] });
                 }
             });
 
         toTry.sort(byCost);
     }
-    
+
     return cost;
 }
 
 const getValueAtPosition = (data) => ({ x, y }) => data[y][x];
 
-const getClosest = ({ width, height, top=0, left=0 }, diagonal = false) => ({ x, y }) => {
+const getClosest = ({ width, height, top = 0, left = 0 }, diagonal = false) => ({ x, y }) => {
     const pos = [];
     const getIdx = (x, y) => y * width + x;
     if (x > left) pos.push({ x: x - 1, y });
