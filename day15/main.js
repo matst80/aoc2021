@@ -12,10 +12,8 @@ const {
 
 const transform = numberGrid;
 
-
 const shortestPath = (map, startPos = { x: 0, y: 0, idx: 0 }) => {
-    const size = extentArray(map);
-    const { width, height } = size;
+    const { width, height } = extentArray(map);
 
     const isEndPos = ({ x, y }) => (y === height - 1 && x === width - 1);
     const getCost = ({ x, y }) => map[y][x];
@@ -29,13 +27,12 @@ const part1 = (map) => {
     return shortestPath(map);
 };
 
-const expandMap = (map, times = 5) => {
-    const size = extentArray(map);
-    const { width, height } = size;
+const expandMap = (baseMap, times = 5) => {
+    const { width, height } = extentArray(baseMap);
     const totalMap = makeGrid(width * times, height * times);
     const totalSize = extentArray(totalMap);
 
-    const getMod = (x, y) => map[y % height][x % height];
+    const getMod = (x, y) => baseMap[y % height][x % height];
     const set = (x, y, value) => totalMap[y][x] = value;
 
     const getTileAdd = (x, y) => {
@@ -51,7 +48,7 @@ const expandMap = (map, times = 5) => {
     });
 
     // const logPart = (tileX, tileY) => {
-    //     console.log(formatGrid(copyGridPart(width * tileX, height * tileY, size, totalMap)));
+    //     console.log(formatGrid(copyGridPart(width * tileX, height * tileY, {width,height}, totalMap)));
     // }
     // logPart(0, 0);
     // console.log('----');
@@ -68,5 +65,5 @@ module.exports = {
     transform,
     part1,
     part2,
-    test: 1,
+    test: 0,
 };
