@@ -8,24 +8,33 @@ const {
     copyGridPart,
     aStar,
     formatGrid,
+    manhattan,
 } = require("../common.js");
 
 const transform = numberGrid;
 
-const shortestPath = (map, startPos = { x: 0, y: 0, idx: 0 }) => {
+const byCost = (a, b) => b.cost - a.cost;
+
+const shortestPath = (map, startPos, isTest) => {
     const { width, height } = extentArray(map);
 
-    const isEndPos = ({ x, y }) => (y === height - 1 && x === width - 1);
-    const getCost = ({ x, y },prev) => map[y][x]+prev;
-    const close = getClosest({ width, height });
+    const isEnd = ({ x, y }) => (y === height - 1 && x === width - 1);
+    const getCost = ({ x, y }, prev) => map[y][x] + prev;
+
+    const getPossibleSteps = getClosest({ width, height });
     //const closeSorted = (pos) => close(pos);
 
-    const { cost, path } = aStar(startPos, close, isEndPos, getCost);
+    const { cost, path } = aStar({ startPos, getPossibleSteps, isEnd, getCost, sort: byCost });
+
+    if (isTest) {
+        console.log(formatGrid(map, (_, d) => path.some(e => e.x === d.x && e.y === d.y)));
+    }
+
     return cost;
 };
 
-const part1 = (map) => {
-    return shortestPath(map);
+const part1 = (map, isTest) => {
+    return shortestPath(map, { x: 0, y: 0, idx: 0 }, isTest);
 };
 
 const expandMap = (baseMap, times = 5) => {
@@ -58,8 +67,8 @@ const expandMap = (baseMap, times = 5) => {
     return totalMap;
 };
 
-const part2 = (map) => {
-    return shortestPath(expandMap(map, 5));
+const part2 = (map, isTest) => {
+    return shortestPath(expandMap(map, 5), { x: 0, y: 0, idx: 0 }, isTest);
 };
 
 module.exports = {

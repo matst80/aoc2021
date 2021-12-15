@@ -95,9 +95,9 @@ const gridLoop = ({ top = 0, left = 0, width, height }, cb, arr) => {
     return grid;
 };
 
-addColorAndJoin = (mark) => (line) => {
+addColorAndJoin = (mark) => (line,y) => {
     return line
-        .map((d) => (mark && mark(d) ? `\x1b[42m${d}\x1b[0m` : d))
+        .map((d,x) => (mark && mark(d,{x,y}) ? `\x1b[42m${d}\x1b[0m` : d))
         .join("");
 };
 
@@ -124,9 +124,7 @@ const getResultAfter = (nr, fn) => {
     return c;
 };
 
-const byCost = (a, b) => b.cost - a.cost;
-
-const aStar = (startPos, getPossibleSteps, isEnd, getCost) => {
+const aStar = ({startPos, getPossibleSteps, isEnd, getCost, sort}) => {
     const walked = new Set();
     const toTry = [{ pos: startPos, cost: 0 }];
     while (toTry.length > 0) {
@@ -143,10 +141,10 @@ const aStar = (startPos, getPossibleSteps, isEnd, getCost) => {
             }
         });
 
-        toTry.sort(byCost);
+        toTry.sort(sort);
     }
 
-    return cost;
+    //return cost;
 };
 
 const getValueAtPosition =
