@@ -1,74 +1,63 @@
-const { seq, log, makeGrid, gridLoop, extentArray, numbers, numberGrid, charGrid, count, asNumbers } = require('../common.js');
+const { add, seq, asNumbers } = require("../common.js");
 
 const transform = (input) => {
-    const [start, _, ...rest] = input.split('\n');
+  const [start, _, ...rules] = input.split("\n");
 
-    const react = rest.map(r => {
+  return {
+    template: start.split(""),
+    rules: new Map(rules.map((d) => d.split(" -> "))),
+  };
+};
 
-        const [a, b] = r.split('->').map(d => d.trim());
-        const t = a.trim().split('');
+const getPairs = (template) =>
+  template.reduce(
+    (map, v, i, arr) =>
+      i + 1 < arr.length
+        ? map.set(v + arr[i + 1], (map.get(v + arr[i + 1]) || 0) + 1)
+        : map,
+    new Map()
+  );
 
-        return { from: a.trim().split(''), to: b, result: t[0] + b.trim() + t[1] };
-    })
-    return { start: start.split(''), react };
-}
+const getElements = (template) =>
+  template.reduce((all, v) => all.set(v, (all.get(v) || 0) + 1), new Map());
 
-const part1 = ({ start, react }) => {
-    let data = start;
-    const step = () => {
-        let add = [];
-        for (var p = 1; p < data.length; p++) {
-            const a = data[p - 1];
-            const b = data[p];
-            react.filter(d => d.from[0] === a && d.from[1] === b).forEach(r => {
-                add.push({p,chr:r.to});
-            });
-        }
-        add.forEach(({p,chr},add)=>{
-            data.splice(p+add,0,chr);
-        })
-        //console.log(add);
-    }
-    seq(10).forEach(step)
-    
-    //console.log(data.join(''),data.length);
-    const elms = data.reduce((sum,i)=>{
-        return {...sum,[i]:(sum[i]??0)+1}
-    },[]);
-    const sortedValues = Object.values(elms).sort(asNumbers);
-    
-    return sortedValues.last()-sortedValues[0];
-}
+const solve = ({ template, rules }, steps = 10) => {
+  let [elms, pairs] = [getElements(template), getPairs(template)];
 
-const part2 = ({ start, react }) => {
-    let data = start;
-    const step = () => {
-        let add = [];
-        for (var p = 1; p < data.length; p++) {
-            const a = data[p - 1];
-            const b = data[p];
-            react.filter(d => d.from[0] === a && d.from[1] === b).forEach(r => {
-                add.push({p,chr:r.to});
-            });
-        }
-        add.forEach(({p,chr},add)=>{
-            data.splice(p+add,0,chr);
-        })
-        //console.log(add);
-    }
-    seq(40).forEach(step)
-    
-    //console.log(data.join(''),data.length);
-    const elms = data.reduce((sum,i)=>{
-        return {...sum,[i]:(sum[i]??0)+1}
-    },[]);
-    const sortedValues = Object.values(elms).sort(asNumbers);
-    console.log(sortedValues);
-    console.log(sortedValues.last()-sortedValues[0]);
+  const reactPossible = (count) => (map, pos) =>
+    map.set(pos, (map.get(pos) || 0) + count);
 
-    return sortedValues.last()-sortedValues[0];
-}
+  const updatePairs = (all, { pair: [a, b], count, chr }) => {
+    elms.set(chr, (elms.get(chr) || 0) + count);
+    return [a + chr, chr + b].reduce(reactPossible(count), all);
+  };
+
+  const transform = () =>
+    [...pairs.entries()].map(([pair, count]) => ({
+      pair,
+      count,
+      chr: rules.get(pair),
+    }));
+
+  while (steps--) {
+    pairs = transform().reduce(updatePairs, new Map());
+  }
+
+  const sorted = [...elms.values()].sort(asNumbers);
+  return sorted.last() - sorted[0];
+};
+
+const part1 = (input) => {
+  return solve(input, 10);
+};
+
+const part2 = (input) => {
+  return solve(input, 40);
+};
 
 module.exports = {
-    transform, part1, part2, test: 0
-}
+  transform,
+  part1,
+  part2,
+  test: 0,
+};
