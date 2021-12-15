@@ -32,12 +32,12 @@ const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 const lower = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
 const extent = (points) => {
-    const size = points.reduce(({ top, left, width, height }, {x, y}) => {
+    const size = points.reduce(({ top, left, width, height }, { x, y }) => {
         return {
-            top: Math.min(top, y+1),
+            top: Math.min(top, y + 1),
             left: Math.min(left, x),
             width: Math.max(width, x),
-            height: Math.max(height, y+1)
+            height: Math.max(height, y + 1)
         }
     }, { width: 0, height: 0, top: 9999999, left: 9999999 });
     return { ...size, size: (size.height - size.top) * (size.width - size.left) };
@@ -69,7 +69,7 @@ const gridLoop = ({ top = 0, left = 0, width, height }, cb, arr) => {
     for (y = top; y < height; y++) {
         const line = [];
         for (x = left; x < width; x++) {
-            const v = cb(x, y, (arr!==undefined)?arr[y][x]:0);
+            const v = cb(x, y, (arr !== undefined) ? arr[y][x] : 0);
             if (v !== -1)
                 line.push(v);
         }
@@ -104,10 +104,34 @@ const getResultAfter = (nr, fn) => {
     return c;
 }
 
+const byCost = (a, b) => a.cost - b.cost;
+
+const aStar = (startPos, getPossiblePositions, isEnd, getCost) => {
+    const walked = new Set();
+    const toTry = [{ pos: startPos, cost: 0 }];
+    while (toTry.length > 0) {
+        const { pos, cost } = toTry.shift();
+
+        if (isEnd(pos)) return cost;
+
+        getPossiblePositions(pos)
+            .forEach(({ idx, ...p }) => {
+                if (!walked.has(idx)) {
+                    walked.add(idx);
+                    toTry.push({ pos: p, cost: cost + getCost(p) });
+                }
+            });
+
+        toTry.sort(byCost);
+    }
+    return cost;
+}
+
 const getValueAtPosition = (data) => ({ x, y }) => data[y][x];
 
-const getClosest = ({ width, height, top, left }, diagonal = false) => ({ x, y }) => {
+const getClosest = ({ width, height, top=0, left=0 }, diagonal = false) => ({ x, y }) => {
     const pos = [];
+    const getIdx = (x, y) => y * width + x;
     if (x > left) pos.push({ x: x - 1, y });
     if (y > top) pos.push({ x, y: y - 1 });
     if (x < width - 1) pos.push({ x: x + 1, y });
@@ -119,7 +143,7 @@ const getClosest = ({ width, height, top, left }, diagonal = false) => ({ x, y }
         if (y < height - 1 && x < width - 1) pos.push({ x: x + 1, y: y + 1 });
         if (y < height - 1 && x > left) pos.push({ x: x - 1, y: y + 1 });
     }
-    return pos;
+    return pos.map(d => ({ ...d, idx: getIdx(d.x, d.y) }));
 }
 
 const charGrid = a => a.split('\n').map(d => d.trim().split(''));
@@ -134,10 +158,19 @@ const tlog = (isTest) => (...args) => {
     }
 }
 
+const copyGridPart = (xo, yo, { width, height }, map) => {
+    const tmpGrid = makeGrid(width, height);
+    gridLoop({ width, height }, (x, y) => {
+        tmpGrid[y][x] = map[yo + y][xo + x];
+    });
+    return tmpGrid;
+}
+
 module.exports = {
     charGrid,
     seq,
     numberGrid,
+    copyGridPart,
     asNumbers: (a, b) => a - b,
     getResultAfter,
     add,
@@ -147,6 +180,7 @@ module.exports = {
     chars,
     tlog,
     log,
+    aStar,
     gridLoop,
     lower,
     makeGrid,
