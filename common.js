@@ -106,24 +106,27 @@ const getResultAfter = (nr, fn) => {
 
 const byCost = (a, b) => a.cost - b.cost;
 
-const aStar = (startPos, getPossiblePositions, isEnd, getCost) => {
+const aStar = (startPos, getPossibleSteps, isEnd, getCost) => {
     const walked = new Set();
     const toTry = [{ pos: startPos, cost: 0 }];
     while (toTry.length > 0) {
-        const { pos, cost } = toTry.shift();
+        const { pos, cost, path=[] } = toTry.shift();
 
-        if (isEnd(pos)) return cost;
+        if (isEnd(pos)) {
+            return {cost,path};
+        }
 
-        getPossiblePositions(pos)
+        getPossibleSteps(pos)
             .forEach(({ idx, ...p }) => {
                 if (!walked.has(idx)) {
                     walked.add(idx);
-                    toTry.push({ pos: p, cost: cost + getCost(p) });
+                    toTry.push({ pos: p, cost: cost + getCost(p), path:[...path,p] });
                 }
             });
 
         toTry.sort(byCost);
     }
+    
     return cost;
 }
 
