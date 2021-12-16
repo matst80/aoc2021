@@ -11,11 +11,32 @@ const transform = (input) =>
     input
         .trim()
         .split("")
-        .map(d=>parseInt(d,16))
+        .map(d => parseInt(d, 16))
         .map((val) => ({
-             val, bin: (val >>> 0).toString(2).padStart(4, "0") 
+            val, bin: (val >>> 0).toString(2).padStart(4, "0")
         }));
 
+const getLengtsAndData = (packetLength, availableData, length) => {
+    let actualLength = 0;
+    seq(packetLength).forEach(() => {
+        actualLength += getHeader(availableData.substring(actualLength)).length;
+    });
+
+    return {
+        packetData: availableData.substr(0, actualLength),
+        length: actualLength + length,
+        actualLength,
+        packetLength
+    };
+}
+
+const countLiterals = (data) => {
+    let literalPackets = 0;
+    while (data[literalPackets++ * 5] === "1") { }
+    const packetDataLengthInBits = literalPackets * 5;
+    const packetData = data.substr(0, packetDataLengthInBits);
+    return { packetDataLengthInBits, packetData, literalPackets };
+}
 
 const getHeader = (bin) => {
     const [get, getLength] = stringCounter(bin);
@@ -35,36 +56,20 @@ const getHeader = (bin) => {
         const packetLength = toDec(get(i ? 11 : 15));
 
         if (i) {
-            const packetData = get();
-
-            let actualLength = 0;
-            seq(packetLength).forEach(() => {
-                actualLength += getHeader(packetData.substring(actualLength)).length;
-            });
-
             return {
                 ...header,
-                packetData: packetData.substr(0, actualLength),
-                length: getLength() + actualLength,
-                actualLength,
-                packetLength,
+                ...getLengtsAndData(packetLength, get(), getLength())
             };
         }
 
-        const packetData = get(packetLength);
-
-        return { ...header, packetData, length: getLength(), packetLength };
+        return { ...header, packetData: get(packetLength), length: getLength(), packetLength };
     } else {
-        let cnt = 0;
-        const data = get();
-        while (data[cnt++ * 5] === "1") { }
-        const packetDataLengthInBits = cnt * 5;
 
-        const packetData = data.substr(0, packetDataLengthInBits);
+        const {packetDataLengthInBits,...rest} = countLiterals(get());
         return {
             ...header,
-            packetData,
-            literalPackets: cnt,
+            ...rest,
+            packetDataLengthInBits,
             length: getLength() + packetDataLengthInBits,
         };
     }
@@ -85,10 +90,10 @@ const parsePacket = (header) => {
         let subData = packetData.substring(start);
         while (subData.length) {
             let sub = getHeader(subData);
+
             children.push(parsePacket(sub));
 
-            start += sub.length;
-            subData = packetData.substring(start);
+            subData = packetData.substring((start += sub.length));
         }
         return { ...header, children };
     }
