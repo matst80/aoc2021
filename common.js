@@ -194,10 +194,27 @@ const copyGridPart = (xo, yo, { width, height }, map) => {
     return tmpGrid;
 };
 
+const stringCounter = (bin) => {
+    let current = 0;
+    return [
+        (len) => {
+            if (len === undefined) {
+                return bin.substring(current);
+            }
+            const data = bin.substr(current, len);
+            current += len;
+            return data;
+        },
+        () => current,
+    ];
+};
+
+
 module.exports = {
     charGrid,
     seq,
     numberGrid,
+    stringCounter,
     copyGridPart,
     asNumbers: (a, b) => a - b,
     getResultAfter,
