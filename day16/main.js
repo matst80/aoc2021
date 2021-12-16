@@ -1,4 +1,4 @@
-const { seq, log, makeGrid, gridLoop, extentArray, numbers, numberGrid, charGrid } = require('../common.js');
+const { seq, log, makeGrid, gridLoop, extentArray, numbers, numberGrid, charGrid,add,mul } = require('../common.js');
 
 /*
 0 = 0000
@@ -73,14 +73,14 @@ const getHeader = (bin) => {
         if (i) {
             
             const packetData = get();
-            console.log('packets to fetch headers for', packetData);
+            //console.log('packets to fetch headers for', packetData);
             let actualLength = 0;
             seq(packetLength).forEach(() => {
                 const h = getHeader(packetData.substring(actualLength));
-                console.log('got sub',h);
+                //console.log('got sub',h);
                 actualLength += h.length;
             })
-            console.log('parsed headers', actualLength, packetLength);
+            //console.log('parsed headers', actualLength, packetLength);
             return { ...header, packetData:packetData.substr(0,actualLength), length: getLength() + actualLength, actualLength, packetLength}
         }
         
@@ -91,13 +91,13 @@ const getHeader = (bin) => {
     else {
         let cnt = 0;
         const data = get();
-        console.log('literal data to parse', data, getLength(), header, bin);
+        //console.log('literal data to parse', data, getLength(), header, bin);
         while (data[cnt++ * 5] === '1') {
 
         }
         const packetDataLengthInBits = cnt * 5;
 
-        console.log('length??', packetDataLengthInBits);
+        //console.log('length??', packetDataLengthInBits);
         const packetData = data.substr(0, packetDataLengthInBits);
         return { ...header, packetData, literalPackets: cnt, length: getLength() + packetDataLengthInBits }
     }
@@ -105,12 +105,12 @@ const getHeader = (bin) => {
 
 const parsePacket = (header) => {
     const { typeId, i, packetData, version, isLiteral } = header;
-    console.log('parent', header);
+    //console.log('parent', header);
 
     if (isLiteral) {
         const { literalPackets } = header;
         const binaryValue = seq(literalPackets).map((_, nr) => packetData.substr(nr * 5 + 1, 4)).join('');
-        console.log(toDec(binaryValue));
+      //  console.log(toDec(binaryValue));
         return { ...header, literal: toDec(binaryValue) };
     }
     else {
@@ -118,7 +118,7 @@ const parsePacket = (header) => {
         let children = [];
         let subData = packetData.substring(start);
         while (subData.length) {
-            console.log('parsing sub', start, subData.length);
+            //console.log('parsing sub', start, subData.length);
             let sub = getHeader(subData);
             children.push(parsePacket(sub));
             //console.log(sub.);
@@ -127,84 +127,17 @@ const parsePacket = (header) => {
         }
         return { ...header, children }
     }
-    return;
-    //console.log('parsing', typeId, version, data);
-    if (typeId === 4) {
-        let cnt = 0;
-        let ok = data[cnt * 5] === '1';
-        while (ok) {
-            ok = data[cnt++ * 5] === '1'
-        }
-        const dataLength = cnt * 5;
-        const numbers = seq(cnt).map((_, nr) => data.substr(nr * 5 + 1, 4)).join('');
 
-        const rest = data.substr(dataLength, data.length - dataLength);
-        console.log('literal length', rest, toDec(numbers));
-        //const expectedLength = Math.ceil(data.length / 4) * 4;
-
-
-        //const literalBinary = data.padStart(expectedLength);
-
-        //console.log('literal', data, packetLength, dataLength);
-        return { literal: toDec(numbers), version, typeId, dataLength };
-    }
-
-    const packetLength = i ? 11 : 15;
-    const dataLength = toDec(data.substr(0, packetLength));
-
-    if (dataLength && dataLength > 0) {
-
-
-        //const packetData = data.substr(packetLength, i ? packetLength * 11 : dataLength);
-        //const rest = data.substr(packetData.length);
-
-
-        if (i) {
-            const subPackets = seq(dataLength).map((_, j) => {
-                const subData = data.substr(j * 11, 11);
-                return parsePacket(getHeader(subData))
-            })
-
-            return { dataLength, version, typeId, packetData, rest, packetLength, subPackets };
-        }
-        else {
-            console.log('sub packets parsing', packetData, packetLength)
-            let toParse = packetData;
-            let start = 0;
-            const subPackets = [];
-            while (toParse && toParse.length) {
-                const subPacket = parsePacket(getHeader(toParse));
-                console.log('parsed sub packet', subPacket);
-                subPackets.push(subPacket);
-                start += subPacket.length;
-                if (start < dataLength) {
-                    console.log('one more');
-                    toParse = packetData.substr(start);
-                }
-                else {
-                    toParse = undefined;
-                }
-            }
-            //console.log(dataLength, packetData);
-
-            console.log('subs', subPackets);
-
-            return { dataLength, version, typeId, packetData, rest, packetLength, subPackets };
-        }
-    }
-    console.log('no data?', data);
-    return { dataLength, version, typeId };
 
 }
 
 const toBool = (bin) => bin === '1';
 
-const ttt = 'EE00D40C823060';
 
 const part1 = (i) => {
 
     const binary = i.map(d => d.bin).join('');
-    //const binary = '11010001010';
+    
 
     const data = parsePacket(getHeader(binary));
 
@@ -218,7 +151,7 @@ const part1 = (i) => {
 
     //console.log('main data', data);
     parse(data);
-    console.log(data)
+    //console.log(data)
 
 
 
@@ -226,8 +159,42 @@ const part1 = (i) => {
 }
 
 const part2 = (i) => {
-    const result = undefined;
-    return result;
+    const binary = i.map(d => d.bin).join('');
+    
+
+    const parse = (node) => {
+        
+        if (node.children) {
+            const childData = node.children.map(parse);
+            //console.log(childData, node.typeId);
+            
+            if (node.typeId===0) 
+                return childData.reduce(add,0);
+            if (node.typeId===1) 
+                return childData.reduce(mul,1);
+            if (node.typeId===2) 
+                return Math.min(...childData);
+            if (node.typeId===3) 
+                return Math.max(...childData);
+            if (node.typeId===5) 
+                return childData[0]>childData[1]?1:0;
+            if (node.typeId===6) 
+                return childData[0]<childData[1]?1:0;
+            if (node.typeId===7) 
+                return childData[0]===childData[1]?1:0;
+        }
+        
+        if (node.isLiteral) {
+            return node.literal;
+        }
+        //console.log(node);
+        
+    }
+
+
+    const data = parsePacket(getHeader(binary));
+
+    return parse(data);
 }
 
 module.exports = {
