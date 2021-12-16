@@ -16,9 +16,9 @@ const transform = (input) =>
             val, bin: (val >>> 0).toString(2).padStart(4, "0")
         }));
 
-const getLengtsAndData = (packetLength, availableData, length) => {
+const getLengthsAndData = (numberOfPackets, availableData, length) => {
     let actualLength = 0;
-    seq(packetLength).forEach(() => {
+    seq(numberOfPackets).forEach(() => {
         actualLength += getHeader(availableData.substring(actualLength)).length;
     });
 
@@ -26,7 +26,7 @@ const getLengtsAndData = (packetLength, availableData, length) => {
         packetData: availableData.substr(0, actualLength),
         length: actualLength + length,
         actualLength,
-        packetLength
+        numberOfPackets
     };
 }
 
@@ -53,19 +53,18 @@ const getHeader = (bin) => {
     };
 
     if (!isLiteral) {
-        const packetLength = toDec(get(i ? 11 : 15));
-
-        if (i) {
-            return {
-                ...header,
-                ...getLengtsAndData(packetLength, get(), getLength())
-            };
-        }
-
-        return { ...header, packetData: get(packetLength), length: getLength(), packetLength };
+        const size = toDec(get(i ? 11 : 15));
+        return (i) ? {
+            ...header,
+            ...getLengthsAndData(size, get(), getLength())
+        } : { 
+            ...header, 
+            packetData: get(size), 
+            length: getLength() 
+        };
     } else {
 
-        const {packetDataLengthInBits,...rest} = countLiterals(get());
+        const { packetDataLengthInBits, ...rest } = countLiterals(get());
         return {
             ...header,
             ...rest,
@@ -90,9 +89,7 @@ const parsePacket = (header) => {
         let subData = packetData.substring(start);
         while (subData.length) {
             let sub = getHeader(subData);
-
             children.push(parsePacket(sub));
-
             subData = packetData.substring((start += sub.length));
         }
         return { ...header, children };
@@ -103,22 +100,22 @@ const toBool = (bin) => bin === "1";
 
 const part1 = (i) => {
     let v = 0;
-    const parse = (node) => {
+    const sumVersion = (node) => {
         v += node.version;
         if (node.children) {
-            node.children.forEach(parse);
+            node.children.forEach(sumVersion);
         }
     };
 
-    parse(parsePacket(getHeader(i.map((d) => d.bin).join(""))));
+    sumVersion(parsePacket(getHeader(i.map((d) => d.bin).join(""))));
 
     return v;
 };
 
 const part2 = (i) => {
-    const parse = (node) => {
+    const calculateNode = (node) => {
         if (node.children) {
-            const childData = node.children.map(parse);
+            const childData = node.children.map(calculateNode);
 
             if (node.typeId === 0) return childData.reduce(add, 0);
             if (node.typeId === 1) return childData.reduce(mul, 1);
@@ -134,7 +131,7 @@ const part2 = (i) => {
         }
     };
 
-    return parse(parsePacket(getHeader(i.map((d) => d.bin).join(""))));
+    return calculateNode(parsePacket(getHeader(i.map((d) => d.bin).join(""))));
 };
 
 module.exports = {
