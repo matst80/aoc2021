@@ -30,33 +30,104 @@ const transform = input => input.trim().split('').map(chr => {
 //const tt = '00111000000000000110111101000101001010010001001000000000';
 
 
-const parts = [
-    { name: 'V', length: 3 },
-    { name: 'T', length: 3 },
-    { name: 'I', length: 1 },
-]
+const counter = (bin) => {
+    let current = 0;
+    return [
+        (len) => {
+            if (len === undefined) {
+                const rest = bin.substring(current);
+                //len += rest;
+                return rest;
+            }
+            const data = bin.substr(current, len);
+            current += len;
+            return data;
+        }, () => current
+    ];
+}
+
 
 const getHeader = (bin) => {
-    const typeId = toDec(bin.substr(3, 3));
-    const i = toBool(bin.substr(6, 1));
+
+    const [get, getLength] = counter(bin);
+    const version = toDec(get(3));
+    const typeId = toDec(get(3));
     const isLiteral = typeId === 4;
-    const packetLengthSize = i?11:15;
-    const packets = 
-    return {
-        version: toDec(bin.substr(0, 3)),
+    const i = isLiteral ? false : toBool(get(1));
+    //console.log(version, typeId, length);
+
+    //const dataIncludingLength = bin.substr(length);
+    const header = {
+        version,
         isLiteral,
         typeId,
         i,
-        data: bin.substr(isLiteral ? 6 : 7)
+        //data
+    };
+
+    if (!isLiteral) {
+
+        const packetDataLengthInBits = i ? 11 : 15;
+        const packetLength = toDec(get(packetDataLengthInBits));
+
+        if (i) {
+            
+            const packetData = get();
+            console.log('packets to fetch headers for', packetData);
+            let actualLength = 0;
+            seq(packetLength).forEach(() => {
+                const h = getHeader(packetData.substring(actualLength));
+                console.log('got sub',h);
+                actualLength += h.length;
+            })
+            console.log('parsed headers', actualLength, packetLength);
+            return { ...header, packetData:packetData.substr(0,actualLength), length: getLength() + actualLength, actualLength, packetLength}
+        }
+        
+        const packetData = get(packetLength);
+
+        return { ...header, packetData, length: getLength(), packetLength }
+    }
+    else {
+        let cnt = 0;
+        const data = get();
+        console.log('literal data to parse', data, getLength(), header, bin);
+        while (data[cnt++ * 5] === '1') {
+
+        }
+        const packetDataLengthInBits = cnt * 5;
+
+        console.log('length??', packetDataLengthInBits);
+        const packetData = data.substr(0, packetDataLengthInBits);
+        return { ...header, packetData, literalPackets: cnt, length: getLength() + packetDataLengthInBits }
     }
 }
 
-const parsePacket = ({ typeId, i, data, version }) => {
+const parsePacket = (header) => {
+    const { typeId, i, packetData, version, isLiteral } = header;
+    console.log('parent', header);
 
-    
-
-    
-
+    if (isLiteral) {
+        const { literalPackets } = header;
+        const binaryValue = seq(literalPackets).map((_, nr) => packetData.substr(nr * 5 + 1, 4)).join('');
+        console.log(toDec(binaryValue));
+        return { ...header, literal: toDec(binaryValue) };
+    }
+    else {
+        let start = 0;
+        let children = [];
+        let subData = packetData.substring(start);
+        while (subData.length) {
+            console.log('parsing sub', start, subData.length);
+            let sub = getHeader(subData);
+            children.push(parsePacket(sub));
+            //console.log(sub.);
+            start += sub.length;
+            subData = packetData.substring(start)
+        }
+        return { ...header, children }
+    }
+    return;
     //console.log('parsing', typeId, version, data);
     if (typeId === 4) {
         let cnt = 0;
@@ -64,10 +135,10 @@ const parsePacket = ({ typeId, i, data, version }) => {
         while (ok) {
             ok = data[cnt++ * 5] === '1'
         }
-        const dataLength = cnt*5;
+        const dataLength = cnt * 5;
         const numbers = seq(cnt).map((_, nr) => data.substr(nr * 5 + 1, 4)).join('');
 
-        const rest = data.substr(dataLength,data.length-dataLength);
+        const rest = data.substr(dataLength, data.length - dataLength);
         console.log('literal length', rest, toDec(numbers));
         //const expectedLength = Math.ceil(data.length / 4) * 4;
 
@@ -82,12 +153,12 @@ const parsePacket = ({ typeId, i, data, version }) => {
     const dataLength = toDec(data.substr(0, packetLength));
 
     if (dataLength && dataLength > 0) {
-        
-                
+
+
         //const packetData = data.substr(packetLength, i ? packetLength * 11 : dataLength);
         //const rest = data.substr(packetData.length);
-        
-        
+
+
         if (i) {
             const subPackets = seq(dataLength).map((_, j) => {
                 const subData = data.substr(j * 11, 11);
@@ -105,8 +176,8 @@ const parsePacket = ({ typeId, i, data, version }) => {
                 const subPacket = parsePacket(getHeader(toParse));
                 console.log('parsed sub packet', subPacket);
                 subPackets.push(subPacket);
-                start+=subPacket.length;
-                if (start<dataLength) {
+                start += subPacket.length;
+                if (start < dataLength) {
                     console.log('one more');
                     toParse = packetData.substr(start);
                 }
@@ -133,16 +204,25 @@ const ttt = 'EE00D40C823060';
 const part1 = (i) => {
 
     const binary = i.map(d => d.bin).join('');
-
+    //const binary = '11010001010';
 
     const data = parsePacket(getHeader(binary));
 
-    console.log('main data', data);
+    let v = 0;
+    const parse = (node) => {
+        v+=node.version;
+        if (node.children) {
+            node.children.forEach(parse);
+        }
+    }
+
+    //console.log('main data', data);
+    parse(data);
+    console.log(data)
 
 
 
-
-    return data.version;
+    return v;
 }
 
 const part2 = (i) => {
@@ -151,5 +231,5 @@ const part2 = (i) => {
 }
 
 module.exports = {
-    transform, part1, part2, test: 1
+    transform, part1, part2, test: 0
 }
