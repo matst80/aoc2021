@@ -79,7 +79,7 @@ const parsePacket = (header) => {
 
     if (isLiteral) {
         const binaryValue = seq(literalPackets)
-            .map((_, nr) => packetData.substr(nr * 5 + 1, 4))
+            .map((_, idx) => packetData.substr(idx * 5 + 1, 4))
             .join("");
 
         return { ...header, literal: toDec(binaryValue) };
@@ -121,6 +121,7 @@ const part2 = (i) => {
             if (node.typeId === 1) return childData.reduce(mul, 1);
             if (node.typeId === 2) return Math.min(...childData);
             if (node.typeId === 3) return Math.max(...childData);
+            // 4 is missing?
             if (node.typeId === 5) return childData[0] > childData[1] ? 1 : 0;
             if (node.typeId === 6) return childData[0] < childData[1] ? 1 : 0;
             if (node.typeId === 7) return childData[0] === childData[1] ? 1 : 0;
