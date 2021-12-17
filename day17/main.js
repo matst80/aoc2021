@@ -13,12 +13,14 @@ const isInside = ({ x1, y1, x2, y2 }) => (x, y) => {
     return (x >= x1 && x <= x2 && y >= y1 && y <= y2);
 }
 
+const min = -99999999999;
+
 const shoot = (coords) => {
     const inside = isInside(coords);
     const { x2, y1 } = coords;
     return (dx, dy) => {
         let [x, y] = [0, 0];
-        let maxY = -Infinity;
+        let maxY = min;
         while (x <= x2 && y >= y1) {
             x += dx;
             y += dy;
@@ -32,7 +34,7 @@ const shoot = (coords) => {
 
 const brute = (data) => {
     const { y1, x2 } = data;
-    let maxY = -Infinity;
+    let maxY = min;
     let c = 0;
 
     const fire = shoot(data);
