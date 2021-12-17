@@ -51,10 +51,7 @@ const brute = (data) => {
     return { count: c, maxY }
 }
 
-const part1 = (data) => {
-    const { maxY } = brute(data);
-    return maxY;
-}
+const part1 = ({y1}) =>  (y1*y1+y1)/2;
 
 const part2 = (data) => {
     const { count } = brute(data);
