@@ -19,7 +19,7 @@ const depthCounter = (depth = 0, open = '[', close = ']') => {
     };
 }
 
-const splitLine = (line, index, len = 0) => [line.slice(0, index), line.slice(index + len)];
+const splitLine = (line, index, len = 0) => [line.substr(0, index), line.substr(index + len)];
 
 const singleDigit = new RegExp(/(\d+)/);
 const doubleDigits = new RegExp(/\d\d+/g);
