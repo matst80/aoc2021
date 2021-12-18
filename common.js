@@ -29,6 +29,10 @@ Array.prototype.sum = function () {
     return this.reduce(add, 0);
 };
 
+String.prototype.reverse = function (split=',') {
+    return this.split(split).reverse().join(split)
+}
+
 const log = console.log;
 
 const count = (nr) => (line) =>
@@ -95,9 +99,9 @@ const gridLoop = ({ top = 0, left = 0, width, height }, cb, arr) => {
     return grid;
 };
 
-addColorAndJoin = (mark) => (line,y) => {
+addColorAndJoin = (mark) => (line, y) => {
     return line
-        .map((d,x) => (mark && mark(d,{x,y}) ? `\x1b[42m${d}\x1b[0m` : d))
+        .map((d, x) => (mark && mark(d, { x, y }) ? `\x1b[42m${d}\x1b[0m` : d))
         .join("");
 };
 
@@ -106,7 +110,7 @@ const asNumbers = (a, b) => a - b;
 const formatGrid = (grid, highlight) =>
     grid.map(addColorAndJoin(highlight)).join("\n");
 
-const seq = (l) => new Array(l).fill(0).map((_, i) => i);
+const seq = (l, arr) => new Array(l).fill(0).map((_, i) => arr === undefined ? i : arr[i]);
 
 //const count = (arr) => (value) => arr.reduce((sum, item) => item === value ? sum + 1 : sum, 0);
 
@@ -124,7 +128,7 @@ const getResultAfter = (nr, fn) => {
     return c;
 };
 
-const aStar = ({startPos, getPossibleSteps, isEnd, getCost, sort}) => {
+const aStar = ({ startPos, getPossibleSteps, isEnd, getCost, sort }) => {
     const walked = new Set();
     const toTry = [{ pos: startPos, cost: 0 }];
     while (toTry.length > 0) {
